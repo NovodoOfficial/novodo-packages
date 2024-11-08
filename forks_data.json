@@ -1,0 +1,28 @@
+[
+    {
+        "name": "APP NAME",
+        "description": "APP DESCRIPTION",
+        "version": "1.0.0",
+        "tags": [
+            "TAG 1",
+            "TAG 2"
+        ],
+        "html_url": "https://github.com/OverhaulSMP/novodo-template",
+        "owner": "OverhaulSMP",
+        "created_at": "2024-11-07T16:27:32Z",
+        "updated_at": "2024-11-07T16:27:32Z"
+    },
+    {
+        "name": "APP NAME",
+        "description": "APP DESCRIPTION",
+        "version": "1.0.0",
+        "tags": [
+            "TAG 1",
+            "TAG 2"
+        ],
+        "html_url": "https://github.com/Scrapman238/test-app",
+        "owner": "Scrapman238",
+        "created_at": "2024-11-07T16:20:39Z",
+        "updated_at": "2024-11-07T16:20:39Z"
+    }
+]

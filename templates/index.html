@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Novodo packages</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <nav>
+        <h1>Novodo packages</h1>
+        <button class="refresh-button" id="refresh-button" onclick="reloadPage()">🔃</button>
+    </nav>
+    <div class="content">
+        <div class="forks-container">
+            {% if forks %}
+                {% for fork in forks %}
+                    <div class="fork-item">
+                        <strong class="app-name">{{ fork.name }}</strong>
+                        <div class="fork-details">
+                            <div class="about">
+                                <div class="links">
+                                    <div class="repo-link">
+                                        <a href="{{ fork.html_url }}" target="_blank">{{ fork.html_url }}</a>
+                                    </div>
+                                    <span class="fork-owner">by <a href="https://github.com/{{ fork.owner }}" target="_blank" class="owner-link">{{ fork.owner }}</a></span>
+                                </div>
+                                <p class="description">{{ fork.description }}</p>
+                            </div>
+                            <div class="dates">
+                                <span>Created: {{ fork.created_at | dateformat }}</span>
+                                <span>Updated: {{ fork.updated_at | dateformat }}</span>
+                            </div>
+                        </div>
+                        <div class="actions">
+                            <button>Download</button>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p style="text-align: center; color: white; font-size: 20px;">Nothing here, click 🔃 to refresh</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        // JavaScript function to redirect to /refresh route
+        function reloadPage() {
+            window.location.href = '/refresh';  // Redirects to /refresh, which triggers the fresh data fetch
+        }
+    </script>
+</body>
+</html>
