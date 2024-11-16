@@ -99,9 +99,15 @@ def upgrade_pip():
         print(f"Unexpected error: {e}")
 
 def restart_script():
-    python = sys.executable
-    subprocess.run([python] + sys.argv)
-    sys.exit(0)
+    try:
+        script_path = os.path.abspath(__file__)
+        
+        python = sys.executable
+        subprocess.Popen([python, script_path])
+        sys.exit(0)
+    except Exception as e:
+        print(f"Error restarting script: {e}")
+        sys.exit(1)
 
 def extract_packages_from_requirements(file_path):
     packages = []
@@ -276,11 +282,6 @@ def install_choco():
         subprocess.run(install_ps_script_cmd, check=True, shell=True)
         
         subprocess.run(cleanup_cmd, check=True, shell=True)
-        
-        if is_choco_installed():
-            print("Chocolatey installation completed successfully.")
-        else:
-            print("Chocolatey installation failed.")
     except subprocess.CalledProcessError as e:
         print(f"Error during installation: {e}")
         sys.exit(1)
