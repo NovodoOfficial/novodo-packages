@@ -265,9 +265,9 @@ def install_choco():
         "[System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12; "
         "Invoke-WebRequest https://community.chocolatey.org/install.ps1 -UseBasicP | powershell -noprofile -"
     )
-
+    
     try:
-        subprocess.run(["powershell", "-Command", install_script], check=True)
+        subprocess.run(["powershell", "-Command", install_script], check=True, shell=True)
         if is_choco_installed():
             print("Chocolatey installation completed successfully.")
         else:
