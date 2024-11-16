@@ -263,9 +263,9 @@ def install_choco():
     install_script = (
         "Set-ExecutionPolicy Bypass -Scope Process -Force; "
         "[System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12; "
-        "Invoke-WebRequest https://community.chocolatey.org/install.ps1 -UseBasicP | powershell -noprofile -"
+        "(New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1') | Invoke-Expression"
     )
-    
+
     try:
         subprocess.run(["powershell", "-Command", install_script], check=True, shell=True)
         if is_choco_installed():
