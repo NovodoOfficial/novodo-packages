@@ -1,0 +1,129 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #121212;
+    color: white;
+    min-width: fit-content;
+}
+
+h1 {
+    margin: 20px;
+    margin-bottom: 0;
+    text-align: center;
+}
+
+.forks-container {
+    padding: 20px 0;
+    min-width: 1000px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+    gap: 20px;
+}
+
+.fork {
+    width: 1000px;
+    height: 500px;
+    position: relative;
+    background-image: url('Thumbnail.png');
+    border-radius: 20px;
+}
+
+.fork .fork-design {
+    position: absolute;
+    top: 0;
+    left: 50px;
+}
+
+.fork .fork-name {
+    position: absolute;
+    top: 200px;
+    left: 70px;
+    width: 860px;
+    height: 48px;
+    font-size: 40px;
+    padding: 0;
+    padding-bottom: 20px;
+    margin: 0;
+    font-weight: bold;
+    word-break: keep-all;
+    white-space: nowrap;
+    overflow-y: hidden;
+    overflow-x: auto;
+}
+
+.fork .description {
+    position: absolute;
+    top: 268px;
+    left: 70px;
+    width: 860px;
+    height: 130px;
+    padding: 0;
+    margin: 0;
+    font-size: 18px;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.fork .buttons {
+    position: absolute;
+    top: 403px;
+    left: 70px;
+    height: 50px;
+    width: 860px;
+    display: flex;
+    gap: 20px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    flex-wrap: nowrap;
+}
+
+.fork .buttons a {
+    background-color: #555;
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    flex-grow: 1;
+    padding: 0;
+    margin: 0;
+    height: 30px;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+    border-radius: 5px;
+    min-width: 150px;
+}
+
+.fork .info {
+    position: absolute;
+    top: 458px;
+    left: 70px;
+    width: 860px;
+    height: 17px;
+    display: flex;
+    gap: 20px;
+    color: #bbb;
+    font-size: 18px;
+    overflow-y: hidden;
+    overflow-x: auto;
+    word-break: keep-all;
+    white-space: nowrap;
+    padding-bottom: 20px;
+}
+
+.fork .info p {
+    flex-grow: 1;
+    padding: 0;
+    margin: 0;
+    word-break: keep-all;
+    white-space: nowrap;
+}
+
+.grey-out {
+    color: #888;
+}

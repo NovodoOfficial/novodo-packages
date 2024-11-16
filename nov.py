@@ -1,123 +1,186 @@
-import os
-import json
+from flask import Flask, render_template, redirect, jsonify, url_for, send_from_directory
 import requests
+import json
+import os
+import base64
+import sys
 from datetime import datetime
-from flask import Flask, render_template, redirect, url_for
 
-app = Flask(__name__)
+DEBUG_OVERIDE = True
 
-# GitHub repository details
+def get_logged_in_user_dir():
+    if os.name == 'nt':
+        user_dir = os.environ.get('USERPROFILE', '')
+    else:
+        user_dir = os.environ.get('HOME', '')
+
+    return user_dir
+
+user_directory = get_logged_in_user_dir()
+nov_path = os.path.join(user_directory, "novodo")
+
+script_path = os.path.abspath(__file__)
+
+target_script_path = os.path.join(nov_path, "nov.py")
+
+conditions = os.path.isdir(nov_path) and script_path == target_script_path
+
+if not conditions and not DEBUG_OVERIDE:
+    print("Missing files, install novodo with \"setup.py\" before running")
+    sys.exit(1)
+
+APPS_FOLDER = os.path.join(nov_path, "apps")
+
 OWNER = 'NovodoOfficial'
 REPO = 'novodo-template'
-GITHUB_API_URL = f"https://api.github.com/repos/{OWNER}/{REPO}/forks"
-
-# Path to the file where we store the fork data
-FORKS_DATA_FILE = 'forks_data.json'
-
-# Path to the config.json file
+FORKS_FILE = 'forks.json'
 CONFIG_FILE = 'config.json'
+app = Flask(__name__)
 
-def load_github_token():
+os.makedirs(APPS_FOLDER, exist_ok=True)
+
+def format_date(date_str):
     try:
-        with open(CONFIG_FILE, 'r') as f:
-            config_data = json.load(f)
-            return config_data.get('github', {}).get('token')
-    except (IOError, json.JSONDecodeError) as e:
-        print(f"Error loading GitHub token from config file: {e}")
+        date_obj = datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%SZ")
+        return date_obj.strftime("%d/%m/%Y, %I:%M:%S %p")
+    except ValueError:
+        return date_str
+
+def load_token():
+    if os.path.exists(CONFIG_FILE):
+        with open(CONFIG_FILE, 'r') as file:
+            config = json.load(file)
+            return config.get('github', {}).get('token')
+    else:
+        print(f"Configuration file {CONFIG_FILE} not found. Continuing without token.")
         return None
 
-# Fetch the GitHub token from the config.json file
-GITHUB_TOKEN = load_github_token()
+def get_release_info(user, repo, token=None):
+    url = f"https://api.github.com/repos/{user}/{repo}"
+    headers = {'Authorization': f'token {token}'} if token else {}
 
-if not GITHUB_TOKEN:
-    print("GitHub token is missing or invalid in the config.json file.")
-    exit(1)
+    response = requests.get(url, headers=headers)
+    if response.status_code == 200:
+        repo_data = response.json()
+        release_date = repo_data.get('created_at', 'Not available')
+        
+        default_branch = repo_data.get('default_branch', 'main')
+        commit_url = f"https://api.github.com/repos/{user}/{repo}/commits/{default_branch}"
+        commit_response = requests.get(commit_url, headers=headers)
+        
+        if commit_response.status_code == 200:
+            commit_data = commit_response.json()
+            updated_date = commit_data.get('commit', {}).get('committer', {}).get('date', 'Not available')
+            return {
+                "released": release_date,
+                "updated": updated_date
+            }
+        else:
+            print(f"Failed to fetch last commit info for {user}/{repo}: {commit_response.status_code} - {commit_response.text}")
+            return None
 
-def save_forks_to_file(forks_data):
-    try:
-        with open(FORKS_DATA_FILE, 'w') as f:
-            json.dump(forks_data, f, indent=4)
-    except IOError as e:
-        print(f"Error saving forks data to file: {e}")
+    else:
+        print(f"Failed to fetch repo info for {user}/{repo}: {response.status_code} - {response.text}")
+    return None
 
-def load_forks_from_file():
-    if os.path.exists(FORKS_DATA_FILE):
-        try:
-            with open(FORKS_DATA_FILE, 'r') as f:
-                return json.load(f)
-        except (IOError, json.JSONDecodeError) as e:
-            print(f"Error loading forks data from file: {e}")
-    return []  # Return an empty list if the file doesn't exist or is invalid
+def get_forks(owner, repo, token=None):
+    forks = []
+    url = f"https://api.github.com/repos/{owner}/{repo}/forks"
+    headers = {'Authorization': f'token {token}'} if token else {}
 
-def get_forks():
-    try:
-        # Set the authorization header with the GitHub token
-        headers = {'Authorization': f'token {GITHUB_TOKEN}'}
-
-        # Fetch the list of forks from GitHub with authentication
-        response = requests.get(GITHUB_API_URL, headers=headers)
-        response.raise_for_status()  # Will throw an error if the request fails
-        forks = response.json()
-
-        forks_data = []
-        for fork in forks:
-            # Try fetching the details.json file from the root directory of each fork
-            details_url = f"https://raw.githubusercontent.com/{fork['full_name']}/main/details.json"
-            try:
-                details_response = requests.get(details_url)
-                details_response.raise_for_status()  # Will throw an error if not found
-                details_data = details_response.json()
+    page = 1
+    while True:
+        response = requests.get(url, headers=headers, params={'page': page, 'per_page': 100})
+        if response.status_code == 200:
+            data = response.json()
+            if not data:
+                break
+            for fork in data:
+                app_json_content = get_app_json(fork['owner']['login'], fork['name'], token)
+                release_info = get_release_info(fork['owner']['login'], fork['name'], token)
                 
-                # Extract the 'name' from 'app_info' in details.json, if available
-                app_name = details_data.get('app_info', {}).get('name', fork['name'])  # Fallback to the GitHub fork name
-                app_description = details_data.get('app_info', {}).get('description', 'No description available')
-                app_version = details_data.get('app_info', {}).get('version', 'Unknown version')
-                tags = details_data.get('tags', [])
-            except requests.RequestException as e:
-                print(f"Error fetching details.json for fork {fork['name']}: {e}")
-                # If there's an error fetching details.json, fall back to the GitHub fork name
-                app_name = fork['name']
-                app_description = 'No description available'
-                app_version = 'Unknown version'
-                tags = []
+                if app_json_content and release_info:
+                    formatted_released = format_date(release_info["released"])
+                    formatted_updated = format_date(release_info["updated"])
 
-            # Add fork info to the list
-            forks_data.append({
-                'name': app_name,
-                'description': app_description,
-                'version': app_version,
-                'tags': tags,
-                'html_url': fork['html_url'],
-                'owner': fork['owner']['login'],
-                'created_at': fork['created_at'],
-                'updated_at': fork['updated_at']
-            })
+                    app_json_content["details"]["snapshotting"]["released"] = formatted_released
+                    app_json_content["details"]["snapshotting"]["updated"] = formatted_updated
 
-        # Save the fetched data to the file
-        save_forks_to_file(forks_data)
-        return forks_data
-    except requests.RequestException as e:
-        print(f"Error fetching forks from GitHub: {e}")
-        return []
+                    forks.append({
+                        "user": fork['owner']['login'],
+                        "repo": fork['name'],
+                        "app.json": app_json_content
+                    })
+            page += 1
+        else:
+            print(f"Failed to fetch forks: {response.status_code} - {response.text}")
+            break
 
-@app.route('/')
-def index():
-    forks = load_forks_from_file()  # Load the data from the file
-    return render_template('index.html', forks=forks, owner=OWNER, repo=REPO)
+    return forks
+
+def get_app_json(user, repo, token=None):
+    url = f"https://api.github.com/repos/{user}/{repo}/contents/app.json"
+    headers = {'Authorization': f'token {token}'} if token else {}
+
+    response = requests.get(url, headers=headers)
+    if response.status_code == 200:
+        data = response.json()
+        if 'content' in data and data['encoding'] == 'base64':
+            try:
+                content = json.loads(base64.b64decode(data['content']).decode('utf-8'))
+                return content
+            except (json.JSONDecodeError, ValueError) as e:
+                print(f"Invalid JSON in app.json for {user}/{repo}: {e}")
+                return None
+    elif response.status_code == 404:
+        print(f"No app.json found in {user}/{repo}.")
+    else:
+        print(f"Failed to fetch app.json for {user}/{repo}: {response.status_code} - {response.text}")
+    return None
+
+def save_forks(forks):
+    with open(FORKS_FILE, 'w') as file:
+        json.dump(forks, file, indent=4)
+    print(f"Saved {len(forks)} forks to {FORKS_FILE}")
 
 @app.route('/refresh')
 def refresh_forks():
-    forks_data = get_forks()  # Fetch fresh data from GitHub
-    save_forks_to_file(forks_data)  # Save the fresh data to the file
-    return redirect(url_for('display_forks'))  # Redirect to the main page to display the updated data
+    token = load_token()
+    forks = get_forks(OWNER, REPO, token)
+    save_forks(forks)
+    return redirect('/')
 
-# Add a custom filter for date formatting
-@app.template_filter('dateformat')
-def dateformat(value):
-    if value:
-        date_obj = datetime.strptime(value, '%Y-%m-%dT%H:%M:%SZ')
-        return date_obj.strftime('%Y-%m-%d')
-    return value
+@app.route('/')
+def index():
+    forks_data = []
+    if os.path.exists(FORKS_FILE):
+        with open(FORKS_FILE, 'r') as file:
+            forks_data = json.load(file)
+    return render_template('index.html', forks=forks_data)
 
-if __name__ == '__main__':
-    app.run(debug=True)
+@app.route('/apps/<user>/<repo>/view')
+def view_app(user, repo):
+    if os.path.exists(FORKS_FILE):
+        with open(FORKS_FILE, 'r') as file:
+            forks_data = json.load(file)
+            fork_data = next((fork for fork in forks_data if fork['user'] == user and fork['repo'] == repo), None)
+            if fork_data:
+                return render_template('fork.html', fork=fork_data)
+    return 404
+
+@app.route('/api/apps/<user>/<repo>/download')
+def download_app(user, repo):
+    if os.path.exists(FORKS_FILE):
+        with open(FORKS_FILE, 'r') as file:
+            forks_data = json.load(file)
+            fork_data = next((fork for fork in forks_data if fork['user'] == user and fork['repo'] == repo), None)
+            if fork_data:
+                return redirect(f"/apps/{user}/{repo}/view")
+    return 404
+
+@app.errorhandler(404)
+def page_not_found(error):
+    return render_template('404.html'), 404
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=80, debug=DEBUG_OVERIDE)

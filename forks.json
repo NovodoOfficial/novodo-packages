@@ -1,0 +1,42 @@
+[
+    {
+        "user": "Scrapman238",
+        "repo": "my-novodo-app",
+        "app.json": {
+            "details": {
+                "name": "My app",
+                "description": "Template app",
+                "snapshotting": {
+                    "version": "1.0.0",
+                    "name": "First release!",
+                    "notes": "This is the first release of my app",
+                    "released": "10/11/2024, 12:35:32 PM",
+                    "updated": "10/11/2024, 12:42:27 PM"
+                }
+            },
+            "supported": [
+                "Windows",
+                "Linux",
+                "Mac"
+            ],
+            "buttons": [
+                {
+                    "name": "Run",
+                    "color": {
+                        "text": "#ffffff",
+                        "bg": "#9cda4a"
+                    },
+                    "file": "run"
+                },
+                {
+                    "name": "Open UI",
+                    "color": {
+                        "text": "#ffffff",
+                        "bg": "#1aa3e8"
+                    },
+                    "file": "ui"
+                }
+            ]
+        }
+    }
+]

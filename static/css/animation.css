@@ -1,0 +1,30 @@
+body {
+    opacity: 0;
+    transition: opacity 500ms ease-out;
+}
+
+@-moz-document url-prefix() {
+    body {
+        opacity: 1 !important;
+    }
+
+    .circle {
+        transition: width 500ms ease-in, height 500ms ease-in, background-color 500ms ease-in !important;
+    }
+}
+
+.circle {
+    position: fixed;
+    border-radius: 50%;
+    background-color: #00C800;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+    transition: width 500ms ease-in, height 500ms ease-in, background-color 500ms ease-in;
+    z-index: 1000;
+    transform: translate(-50%, -50%);
+}
+
+.opacity-set-visible {
+    opacity: 1;
+}

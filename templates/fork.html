@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Novodo/{{ fork["user"] }}/{{ fork["app.json"]["details"]["name"] }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/fork.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/animation.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.png') }}" type="image/x-icon">
+</head>
+<body>
+    {% include 'navbar.html' %}
+    
+    <div class="fork-container">
+        <div class="fork">
+            <img src="/static/css/Thumbnail.png" class="bg-image">
+
+            <div class="user">
+                <img src="/static/css/pfp.png" class="pfp-image">
+                <h3 class="fork-name">{{ fork["app.json"]["details"]["name"] }}</h3>
+            </div>
+
+            <h3 class="name"><span class="grey-out">By</span> {{ fork["user"] }}</h3>
+
+            <div class="about">
+                <h1>About</h1>
+                <p class="description">{{ fork["app.json"]["details"]["description"] }}</p>
+
+                <div class="buttons">
+                    <a href="{{ url_for('download_app', user=fork['user'], repo=fork['repo']) }}" class="btn-download">Download</a>
+                </div>
+        
+                <hr>
+                <h1>Info</h1>
+                <p>Released:{{ fork["app.json"]["details"]["snapshotting"]["released"] }}</p>
+                <p>Updated: {{ fork["app.json"]["details"]["snapshotting"]["updated"] }}</p>
+                <hr>
+                <h1>Version {{ fork["app.json"]["details"]["snapshotting"]["version"] }} - {{ fork["app.json"]["details"]["snapshotting"]["name"] }}</h1>
+                <p>{{ fork["app.json"]["details"]["snapshotting"]["notes"] }}</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/animation.js') }}"></script>
+</body>
+</html>
