@@ -303,6 +303,8 @@ def install_node_windows():
     if not is_choco_installed():
         if ask_yes_no("Install choco?", "Choco is not installed and required. Do you want to install it now?"):
             install_choco()
+            print("Waiting for choco to be recognised before restart (30s)")
+            time.sleep(30)
             restart_script()
         else:
             print("Choco is needed for setup. Exiting.")
@@ -364,6 +366,8 @@ def main():
                 print(f"Unsupported OS: {system}. Please install Node.js manually.")
                 sys.exit(1)
 
+            print("Waiting for node to be recognised before restart (30s)")
+            time.sleep(30)
             restart_script()
         else:
             print("Node is needed for setup. Exiting.")
