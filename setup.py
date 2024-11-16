@@ -260,14 +260,23 @@ def is_choco_installed():
 def install_choco():
     print("Installing Chocolatey...")
 
-    install_script = (
-        "Set-ExecutionPolicy Bypass -Scope Process -Force; "
-        "[System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12; "
-        "(New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1') | Invoke-Expression"
+    download_script_cmd = (
+        "curl -o install.ps1 https://community.chocolatey.org/install.ps1"
     )
 
+    install_ps_script_cmd = (
+        "powershell -NoProfile -ExecutionPolicy Bypass -File install.ps1"
+    )
+
+    cleanup_cmd = "del install.ps1"
+
     try:
-        subprocess.run(["powershell", "-Command", install_script], check=True, shell=True)
+        subprocess.run(download_script_cmd, check=True, shell=True)
+        
+        subprocess.run(install_ps_script_cmd, check=True, shell=True)
+        
+        subprocess.run(cleanup_cmd, check=True, shell=True)
+        
         if is_choco_installed():
             print("Chocolatey installation completed successfully.")
         else:
