@@ -19,28 +19,24 @@ def load_github_token():
             with open(config_path, 'r') as f:
                 config_data = json.load(f)
                 
-                sections = config_data.get('sections', [])
-                if not isinstance(sections, list):
-                    print("'sections' is not a list or missing.")
+                if 'sections' not in config_data or not isinstance(config_data['sections'], list):
+                    print("'sections' is missing or not a list.")
                     return None
                 
-                for section in sections:
-                    if section.get('name') == "Github":
-                        options = section.get('options', [])
-                        
-                        if not isinstance(options, list):
-                            print("'options' is not a list or missing in the 'Github' section.")
+                for section in config_data['sections']:
+                    if 'name' in section and section['name'] == "Github":
+                        if 'options' not in section or not isinstance(section['options'], list):
+                            print("'options' is missing or not a list in the 'Github' section.")
                             return None
                         
-                        for option in options:
-                            if option.get('name') == "Github token":
-                                token = option.get('value', "")
-                                print(f"TOKEN: {token}")
-                                
-                                if token:
-                                    return token
+                        for option in section['options']:
+                            if 'name' in option and option['name'] == "Github token":
+                                if 'value' in option:
+                                    token = option['value']
+                                    print(f"TOKEN: {token}")
+                                    return token if token else None
                                 else:
-                                    print("GitHub token is empty.")
+                                    print("'value' is missing in the 'Github token' option.")
                                     return None
                 
                 print("GitHub section or token option not found in config.json.")
