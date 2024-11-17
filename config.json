@@ -28,7 +28,7 @@
           "description": "Allow access by any device on the local network (use localhost or 127.0.0.1 if disabled)",
           "type": "bool",
           "input": "switch",
-          "value": true,
+          "value": false,
           "default": false,
           "attributes": [
             "restart_required"

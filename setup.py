@@ -425,6 +425,8 @@ def main():
 
     install_requirements_file(requirements_path)
 
+    restart_script()
+
     requrements = extract_packages_from_requirements(requirements_path)
 
     wait_for_packages(requrements)
