@@ -1,4 +1,4 @@
 requests
 flask
-flask-debugtoolbar
+Flask-DebugToolbar
 waitress
