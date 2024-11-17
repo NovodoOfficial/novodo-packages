@@ -122,6 +122,8 @@ def extract_packages_from_requirements(file_path):
     return packages
 
 def wait_for_packages(package_list):
+    count = 0
+
     while True:
         missing_packages = []
         for package in package_list:
@@ -136,6 +138,11 @@ def wait_for_packages(package_list):
         
         print(f"Waiting for packages: {', '.join(missing_packages)}...")
         time.sleep(2)
+
+        count += 1
+
+        if count > 4:
+            restart_script()
 
 def install_needed():
     installed_something = False
@@ -424,8 +431,6 @@ def main():
         sys.exit(1)
 
     install_requirements_file(requirements_path)
-
-    restart_script()
 
     requrements = extract_packages_from_requirements(requirements_path)
 
