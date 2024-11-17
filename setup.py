@@ -18,7 +18,10 @@ def load_github_token():
         try:
             with open(config_path, 'r') as f:
                 config_data = json.load(f)
-                token = config_data.get('github', {}).get('token', None)
+                token = config_data.get('sections', []).get(0, {}).get('options', []).get(0, "")
+
+                print(f"TOKEN: {token}")
+
                 if token:
                     return token
                 else:
