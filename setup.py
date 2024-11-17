@@ -347,9 +347,9 @@ def install_node_windows():
     if not is_choco_installed():
         if ask_yes_no("Install choco?", "Choco is not installed and required. Do you want to install it now?"):
             install_choco()
-            print("Waiting for choco to be recognised before restart (30s)")
-            time.sleep(30)
-            restart_script()
+            print("Waiting for choco to be recognised before restart (15s) (re-run the script after the window closes)")
+            time.sleep(15)
+            sys.exit(0)
         else:
             print("Choco is needed for setup. Exiting.")
             sys.exit(1)
@@ -400,7 +400,7 @@ def main():
             sys.exit(1)
 
     if not is_node_installed():
-        if ask_yes_no("Install node?", "Node is not installed and required. Do you want to install it now? (May ask 2 times)"):
+        if ask_yes_no("Install node?", "Node is not installed and required. Do you want to install it now?"):
             system = platform.system()
             if system == "Windows":
                 install_node_windows()
@@ -410,9 +410,9 @@ def main():
                 print(f"Unsupported OS: {system}. Please install Node.js manually.")
                 sys.exit(1)
 
-            print("Waiting for node to be recognised before restart (30s)")
-            time.sleep(30)
-            restart_script()
+            print("Waiting for node to be recognised before restart (15s) (re-run the script after the window closes)")
+            time.sleep(15)
+            sys.exit(0)
         else:
             print("Node is needed for setup. Exiting.")
             sys.exit(1)
