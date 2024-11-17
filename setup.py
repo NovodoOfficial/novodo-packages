@@ -19,9 +19,20 @@ def load_github_token():
             with open(config_path, 'r') as f:
                 config_data = json.load(f)
                 
-                for section in config_data.get('sections', []):
+                sections = config_data.get('sections', [])
+                if not isinstance(sections, list):
+                    print("'sections' is not a list or missing.")
+                    return None
+                
+                for section in sections:
                     if section.get('name') == "Github":
-                        for option in section.get('options', []):
+                        options = section.get('options', [])
+                        
+                        if not isinstance(options, list):
+                            print("'options' is not a list or missing in the 'Github' section.")
+                            return None
+                        
+                        for option in options:
                             if option.get('name') == "Github token":
                                 token = option.get('value', "")
                                 print(f"TOKEN: {token}")
