@@ -377,7 +377,13 @@ def debug_console():
 
         if user_input:
             if user_input in ["stop", "exit", "end"]:
-                sys.exit(0)
+                def restart_async():
+                    time.sleep(1)
+                    os._exit(0)
+
+                Thread(target=restart_async).start()
+
+                return "Script stopped", 200
             
             if user_input == "restart":
                 def restart_async():
