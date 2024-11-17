@@ -140,18 +140,23 @@ def extract_packages_from_requirements(file_path):
 
 def check_for_packages(package_list):
     missing_packages = []
+
     for package in package_list:
         try:
-            importlib.import_module(package)
-        except ImportError:
+            subprocess.run(
+                ["pip", "show", package],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                check=True
+            )
+        except subprocess.CalledProcessError:
             missing_packages.append(package)
     
     if not missing_packages:
         print("All packages are installed and recognized.")
         return
-    
-    print(f"Cant find packages: {', '.join(missing_packages)}\n Restarting now...")
 
+    print(f"Can't find packages: {', '.join(missing_packages)}\nRestarting now...")
     restart_script()
 
 def install_needed():
