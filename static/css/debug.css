@@ -1,0 +1,92 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #121212;
+    color: white;
+    min-width: fit-content;
+}
+
+h1 {
+    text-align: center;
+}
+
+.container {
+    font-family: 'Courier New', Courier, monospace;
+    background-color: #212a37;
+    width: 750px;
+    margin: 0 auto;
+    padding: 10px;
+    border-radius: 20px;
+    overflow-x: hidden;
+}
+
+.commands {
+    width: max-content;
+    width: 750px;
+    overflow-x: auto;
+    padding-bottom: 20px;
+}
+
+.command-section {
+    width: max-content;
+    margin-right: 50px;
+}
+
+.command-line {
+    width: max-content;
+    color: #888;
+}
+
+.output {
+    white-space: pre;
+}
+
+.prompt {
+    color: #77c8ff;
+}
+
+.timestamp {
+    font-size: 0.9em;
+    color: #888;
+}
+
+.command {
+    color: white;
+}
+
+.input-section {
+    display: flex;
+}
+
+.input-section form {
+    display: flex;
+    width: 100%;
+}
+
+input[type="text"] {
+    font-family: 'Courier New', Courier, monospace;
+    padding: 8px;
+    border: none;
+    background-color: #121212;
+    color: white;
+    border-radius: 10px 0 0 10px;
+    font-size: 16px;
+    flex-grow: 1;
+}
+
+input[type="text"]:focus {
+    border: none;
+    outline: none;
+}
+
+input[type="submit"] {
+    padding: 8px 15px;
+    background-color: #121212;
+    border: none;
+    color: #77c8ff;
+    border-radius: 0 10px 10px 0;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+}

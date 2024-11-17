@@ -236,22 +236,40 @@ def download_and_extract_repo(repo_url: str, download_dir: str, github_token: st
         print(f"An unexpected error occurred: {e}")
 
 def create_scheduled_task():
-    script_dir = os.path.dirname(os.path.abspath(__file__))
+    task_name = "NovodoPackagesTask"
+    user_directory = get_logged_in_user_dir()
+    nov_path = os.path.join(user_directory, "novodo")
+    script_path = os.path.join(nov_path, "nov.bat" if sys.platform == "win32" else "nov.sh")
     
-    task_name = "Standby"
-    vbs_path = os.path.join(script_dir, "run_hidden.vbs")
-
-    command = (
-        f'SchTasks /Create /SC ONLOGON /TN "{task_name}" '
-        f'/TR "{vbs_path}" /RL HIGHEST /F'
-    )
-
     try:
-        os.system(command)
+        if sys.platform == "win32":
+            command = (
+                f'SchTasks /Create /SC ONLOGON /TN "{task_name}" '
+                f'/TR "{script_path}" /RL HIGHEST /F'
+            )
+            subprocess.run(command, check=True, shell=True)
+            print(f"Scheduled task '{task_name}' created successfully on Windows.")
+        
+        elif sys.platform in ("linux", "darwin"):
+            cron_line = f"@reboot {script_path}\n"
+            cron_file = f"/tmp/{task_name}.cron"
+            
+            with open(cron_file, "w") as f:
+                existing_cron = subprocess.run(["crontab", "-l"], stdout=subprocess.PIPE, text=True)
+                f.write(existing_cron.stdout.strip() + "\n" + cron_line)
+            
+            subprocess.run(["crontab", cron_file], check=True)
+            os.remove(cron_file)
+            print(f"Scheduled task '{task_name}' added to cron.")
+        
+        else:
+            print(f"Task scheduling is not supported on your OS: {sys.platform}")
+    
+    except subprocess.CalledProcessError as e:
+        print(f"Failed to create scheduled task: {e}")
     except Exception as e:
-        print(f'Error creating task: {e}')
-        print()
-        print("MAKE SURE THIS SCRIPT HAS BEEN RAN AS ADMIN FOR THIS TO WORK")
+        print(f"An unexpected error occurred: {e}")
+
 
 def is_choco_installed():
     try:
@@ -414,6 +432,8 @@ def main():
     os.remove(requirements_path)
 
     download_and_extract_repo('https://github.com/NovodoOfficial/novodo-packages', nov_path, GITHUB_TOKEN)
+
+    create_scheduled_task()
 
 if __name__ == "__main__":
     root = tk.Tk()

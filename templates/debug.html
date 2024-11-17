@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/debug.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/animation.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.png') }}" type="image/x-icon">
+</head>
+<body>
+    {% include 'navbar.html' %}
+
+    <h1>Console</h1>
+    <div class="container">
+        <div class="commands">
+            {% for command, timestamp, result in history %}
+                <div class="command-section">
+                    <div class="command-line">{{ timestamp }}<span class="prompt">./> </span><span class="command">{{ command }}</span></div>
+                    <div class="output">{{ result }}</div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="input-section">
+            <form method="POST">
+                <input type="text" id="command" name="command" placeholder="Enter a command" required />
+                <input type="submit" value="./>" />
+            </form>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/animation.js') }}"></script>
+</body>
+</html>

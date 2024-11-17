@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Novodo/Page Not Found</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/404.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/animation.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.png') }}" type="image/x-icon">
+</head>
+<body>
+    {% include 'navbar.html' %}
+
+    <div class="error-page">
+        <div class="top">
+            <h1>401</h1>
+            <h3>- You are<br>Unauthorised</h3>
+        </div>
+        <p>Sorry, you do not have the correct setup to access this page.</p>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/animation.js') }}"></script>
+</body>
+</html>

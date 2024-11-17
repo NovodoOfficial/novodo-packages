@@ -14,15 +14,18 @@ window.addEventListener('load', () => {
     document.body.style.opacity = '1';
 });
 
-const links = document.querySelectorAll('a');
+const elements = document.querySelectorAll('a, button');
 
-links.forEach(link => {
-    link.addEventListener('click', event => {
-        if (isFirefox) return;
+elements.forEach(element => {
+    let isAnimating = false;
 
+    element.addEventListener('click', event => {
+        if (isAnimating || isFirefox) return;
+
+        isAnimating = true;
         event.preventDefault();
 
-        const targetUrl = link.href;
+        const targetUrl = element.href || element.getAttribute('data-url');
         const circle = document.createElement('div');
         circle.classList.add('circle');
         document.body.appendChild(circle);
@@ -45,7 +48,13 @@ links.forEach(link => {
         });
 
         setTimeout(() => {
-            window.location.href = targetUrl;
+            if (targetUrl) {
+                window.location.href = targetUrl;
+            } else {
+                element.click();
+            }
+
+            isAnimating = false;
         }, 500);
     });
 });
