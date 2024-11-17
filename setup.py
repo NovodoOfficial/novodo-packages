@@ -18,15 +18,22 @@ def load_github_token():
         try:
             with open(config_path, 'r') as f:
                 config_data = json.load(f)
-                token = config_data.get('sections', []).get(0, {}).get('options', []).get(0, "")
-
-                print(f"TOKEN: {token}")
-
-                if token:
-                    return token
-                else:
-                    print("GitHub token not found in config.json.")
-                    return None
+                
+                for section in config_data.get('sections', []):
+                    if section.get('name') == "Github":
+                        for option in section.get('options', []):
+                            if option.get('name') == "Github token":
+                                token = option.get('value', "")
+                                print(f"TOKEN: {token}")
+                                
+                                if token:
+                                    return token
+                                else:
+                                    print("GitHub token is empty.")
+                                    return None
+                
+                print("GitHub section or token option not found in config.json.")
+                return None
         except Exception as e:
             print(f"Error reading config.json: {e}")
             return None
