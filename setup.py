@@ -118,9 +118,13 @@ def upgrade_pip():
 def restart_script():
     try:
         script_path = os.path.abspath(__file__)
-        
         python = sys.executable
-        subprocess.Popen([python, script_path])
+
+        if os.name == "nt":
+            subprocess.Popen(["start", python, script_path], shell=True)
+        elif os.name == "posix":
+            subprocess.Popen(["x-terminal-emulator", "-e", python, script_path])
+        
         sys.exit(0)
     except Exception as e:
         print(f"Error restarting script: {e}")
@@ -396,7 +400,7 @@ def main():
             sys.exit(1)
 
     if not is_node_installed():
-        if ask_yes_no("Install node?", "Node is not installed and required. Do you want to install it now?"):
+        if ask_yes_no("Install node?", "Node is not installed and required. Do you want to install it now? (May ask 2 times)"):
             system = platform.system()
             if system == "Windows":
                 install_node_windows()
