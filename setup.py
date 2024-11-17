@@ -121,28 +121,21 @@ def extract_packages_from_requirements(file_path):
 
     return packages
 
-def wait_for_packages(package_list):
-    count = 0
+def check_for_packages(package_list):
+    missing_packages = []
+    for package in package_list:
+        try:
+            importlib.import_module(package)
+        except ImportError:
+            missing_packages.append(package)
+    
+    if not missing_packages:
+        print("All packages are installed and recognized.")
+        return
+    
+    print(f"Cant find packages: {', '.join(missing_packages)}\n Restarting now...")
 
-    while True:
-        missing_packages = []
-        for package in package_list:
-            try:
-                importlib.import_module(package)
-            except ImportError:
-                missing_packages.append(package)
-        
-        if not missing_packages:
-            print("All packages are installed and recognized.")
-            break
-        
-        print(f"Waiting for packages: {', '.join(missing_packages)}...")
-        time.sleep(2)
-
-        count += 1
-
-        if count > 4:
-            restart_script()
+    restart_script()
 
 def install_needed():
     installed_something = False
@@ -434,7 +427,7 @@ def main():
 
     requrements = extract_packages_from_requirements(requirements_path)
 
-    wait_for_packages(requrements)
+    check_for_packages(requrements)
 
     os.remove(requirements_path)
 
