@@ -36,7 +36,7 @@ elements.forEach(element => {
         circle.style.left = `${clickX}px`;
         circle.style.top = `${clickY}px`;
 
-        const maxDimension = Math.max(window.innerWidth, window.innerHeight) * 2;
+        const maxDimension = Math.max(window.innerWidth, window.innerHeight) * 5;
 
         requestAnimationFrame(() => {
             circle.style.width = `${maxDimension}px`;

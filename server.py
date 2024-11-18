@@ -1,3 +1,4 @@
+import shutil
 import time
 import subprocess
 import requests
@@ -59,8 +60,6 @@ app = Flask(__name__)
 
 app.jinja_env.globals.update(enumerate=enumerate)
 
-os.makedirs(APPS_FOLDER, exist_ok=True)
-
 def format_date(date_str):
     try:
         date_obj = datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%SZ")
@@ -70,11 +69,36 @@ def format_date(date_str):
 
 def load_token():
     if os.path.exists(CONFIG_FILE):
-        with open(CONFIG_FILE, 'r') as file:
-            config = json.load(file)
-            return config.get('github', {}).get('token')
+        try:
+            with open(CONFIG_FILE, 'r') as f:
+                config_data = json.load(f)
+                
+                if 'sections' not in config_data or not isinstance(config_data['sections'], list):
+                    print("'sections' is missing or not a list.")
+                    return None
+                
+                for section in config_data['sections']:
+                    if 'name' in section and section['name'] == "Github":
+                        if 'options' not in section or not isinstance(section['options'], list):
+                            print("'options' is missing or not a list in the 'Github' section.")
+                            return None
+                        
+                        for option in section['options']:
+                            if 'name' in option and option['name'] == "Github token":
+                                if 'value' in option:
+                                    token = option['value']
+                                    return token if token else None
+                                else:
+                                    print("'value' is missing in the 'Github token' option.")
+                                    return None
+                
+                print("GitHub section or token option not found in config.json.")
+                return None
+        except Exception as e:
+            print(f"Error reading config.json: {e}")
+            return None
     else:
-        print(f"Configuration file {CONFIG_FILE} not found. Continuing without token.")
+        print("config.json not found.")
         return None
 
 def get_release_info(user, repo, token=None):
@@ -190,6 +214,85 @@ def view_app(user, repo):
                 return render_template('fork.html', fork=fork_data)
     return 404
 
+def download_and_extract_repo(repo_url: str, download_dir: str, github_token: str):
+    try:
+        import requests
+        import zipfile
+    except ImportError as e:
+        print(f"Error importing libraries: {e}")
+        return
+
+    parts = repo_url.rstrip('/').split('/')
+    owner, repo_name = parts[-2], parts[-1]
+    
+    api_url = f'https://github.com/{owner}/{repo_name}/archive/refs/heads/main.zip'
+    
+    headers = {}
+    if github_token:
+        headers['Authorization'] = f'token {github_token}'
+    
+    if not os.path.exists(download_dir):
+        os.makedirs(download_dir)
+    
+    zip_file_path = os.path.join(download_dir, f'{repo_name}.zip')
+
+    if os.path.exists(zip_file_path):
+        print(f"Overwriting {zip_file_path}.")
+        os.remove(zip_file_path)
+
+    try:
+        print(f"Downloading {repo_name} repository...")
+        response = requests.get(api_url, headers=headers)
+        response.raise_for_status()
+        
+        with open(zip_file_path, 'wb') as file:
+            file.write(response.content)
+        print(f"Repository {repo_name} downloaded successfully as ZIP.")
+        
+        print("Extracting ZIP file...")
+        with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
+            zip_ref.extractall(download_dir)
+        
+        extracted_folder = os.path.join(download_dir, f'{repo_name}-main')
+        if os.path.exists(extracted_folder):
+            for item in os.listdir(extracted_folder):
+                item_path = os.path.join(extracted_folder, item)
+                if os.path.isdir(item_path):
+                    shutil.move(item_path, download_dir)
+                else:
+                    shutil.move(item_path, download_dir)
+            os.rmdir(extracted_folder)
+            print(f"Moved contents from {extracted_folder} to {download_dir}.")
+        
+        os.remove(zip_file_path)
+        print(f"ZIP file {zip_file_path} deleted.")
+    
+    except requests.exceptions.RequestException as e:
+        print(f"An error occurred while downloading: {e}")
+    except zipfile.BadZipFile as e:
+        print(f"Failed to extract ZIP file: {e}")
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+
+def install_requirements_file(path):
+    subprocess.run(['pip', 'install', '-r', path], check=True)
+
+def download(user, repo, fork_data):
+    os.makedirs(APPS_FOLDER, exist_ok=True)
+    token = load_token()
+
+    url = f"https://github.com/{user}/{repo}"
+
+    app_path = os.path.join(APPS_FOLDER, user, repo)
+
+    os.makedirs(app_path, exist_ok=True)
+
+    download_and_extract_repo(url, app_path, token)
+
+    requirements_path = os.path.join(app_path, "requirements.txt")
+
+    install_requirements_file(requirements_path)
+
 @app.route('/api/apps/<user>/<repo>/download')
 def download_app(user, repo):
     if os.path.exists(FORKS_FILE):
@@ -197,6 +300,7 @@ def download_app(user, repo):
             forks_data = json.load(file)
             fork_data = next((fork for fork in forks_data if fork['user'] == user and fork['repo'] == repo), None)
             if fork_data:
+                download(user, repo, fork_data)
                 return redirect(f"/apps/{user}/{repo}/view")
     return 404
 

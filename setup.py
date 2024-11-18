@@ -33,7 +33,7 @@ def load_github_token():
                             if 'name' in option and option['name'] == "Github token":
                                 if 'value' in option:
                                     token = option['value']
-                                    print(f"TOKEN: {token}")
+                                    print(f"TOKEN DETECTED: {token}")
                                     return token if token else None
                                 else:
                                     print("'value' is missing in the 'Github token' option.")
@@ -265,7 +265,7 @@ def create_scheduled_task():
     task_name = "NovodoPackagesTask"
     user_directory = get_logged_in_user_dir()
     nov_path = os.path.join(user_directory, "novodo")
-    script_path = os.path.join(nov_path, "nov.bat" if sys.platform == "win32" else "nov.sh")
+    script_path = os.path.join(nov_path, "nov.vbs" if sys.platform == "win32" else "nov.sh")
     
     try:
         if sys.platform == "win32":
@@ -389,7 +389,53 @@ def install_node_unix():
         print(f"Error during installation: {e}")
         sys.exit(1)
 
+def is_visual_studio_installed():
+    try:
+        result = subprocess.run(["vswhere", "-version", "[15.0,18.0)", "-products", "*", "-requires", "Microsoft.VisualStudio.Component.VC.Tools.x86.x64"], 
+                                stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        return result.returncode == 0
+    except FileNotFoundError:
+        return False
+
+def install_visual_studio():
+    print("Installing Visual Studio...")
+    try:
+        subprocess.run(
+            ["choco", "install", "-y", "visualstudio2019buildtools", "visualstudio2019-workload-vctools"],
+            check=True
+        )
+    except subprocess.CalledProcessError as e:
+        print(f"Visual Studio installation failed: {e}")
+        sys.exit(1)
+
 def main():
+    if os.name == "nt":
+        if not is_visual_studio_installed():
+            if not is_choco_installed():
+                if ask_yes_no(
+                    "Install Chocolatey?",
+                    "Chocolatey is not installed and is required to install Visual Studio. Do you want to install it now?"
+                ):
+                    install_choco()
+                    print("Waiting for Chocolatey installation to complete (15s). Re-run the script.")
+                    time.sleep(15)
+                    sys.exit(0)
+                else:
+                    print("Chocolatey is required for Visual Studio installation. Exiting.")
+                    sys.exit(1)
+
+            if ask_yes_no(
+                "Install Visual Studio?",
+                "Visual Studio is not installed or incompatible. It is required for VBScript support. Do you want to install it now?"
+            ):
+                install_visual_studio()
+                print("Waiting for Visual Studio installation to complete (15s). Re-run the script.")
+                time.sleep(15)
+                sys.exit(0)
+            else:
+                print("Visual Studio is required for VBScript support. Exiting.")
+                sys.exit(1)
+
     if not check_pip_installed():
         if ask_yes_no("Install pip?", "pip is not installed and required. Do you want to install it now?"):
             install_pip()
