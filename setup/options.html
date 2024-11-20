@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Novodo packages setup</title>
+    <link rel="stylesheet" href="setup.css">
+</head>
+<body>
+    <svg width="1" height="1" viewBox="0 0 1 1" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" class="bg-art">
+        <path d="M1 0H0V1L1 0Z" fill="#71B51B"/>
+    </svg>
+
+    <form method="POST" class="form">
+        <svg width="4" height="6" viewBox="0 0 4 6" fill="none" xmlns="http://www.w3.org/2000/svg" class="back-arrow">
+            <path d="M3 1L1 3L3 5" stroke="white"/>
+        </svg>
+
+        <h1 class="page-title">Options</h1>
+        <h2 class="page-subtitle">
+            To continue, all
+            <br>
+            options must be checked
+        </h2>
+
+        <div class="options">
+            <div class="option">
+                <input type="checkbox" id="novodo-packages" name="novodo-packages" value="checked" class="checkbox" checked disabled>
+                <label for="novodo-packages">Novodo packages</label>
+            </div>
+            <div class="option">
+                <input type="checkbox" id="requirements" name="requirements" value="checked" class="checkbox">
+                <label for="requirements">Requirements</label>
+            </div>
+            <div class="requirements">
+                <div class="option">
+                    <input type="checkbox" id="pip" name="pip" value="checked" class="checkbox">
+                    <label for="pip">pip</label>
+                </div>
+                <div class="option">
+                    <input type="checkbox" id="chocolatey" name="chocolatey" value="checked" class="checkbox">
+                    <label for="chocolatey">Chocolatey</label>
+                </div>
+                <div class="option">
+                    <input type="checkbox" id="nodejs" name="nodejs" value="checked" class="checkbox">
+                    <label for="nodejs">Nodejs</label>
+                </div>
+            </div>
+        </div>
+
+        <p class="grey-out">(Already installed requirements will be ignored)</p>
+
+        <div class="buttons">
+            <a href="installation.html">Next</a>
+        </div>
+    </form>
+
+    <script>
+        function checkRequirements() {
+            const requirementCheckboxes = document.querySelectorAll('.requirements .checkbox');
+            const allChecked = Array.from(requirementCheckboxes).every(checkbox => checkbox.checked);
+
+            const requirementsCheckbox = document.getElementById('requirements');
+            
+            requirementsCheckbox.checked = allChecked;
+        }
+
+        document.querySelectorAll('.requirements .checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', checkRequirements);
+        });
+
+        document.getElementById('requirements').addEventListener('change', function() {
+            if (!this.checked) {
+                document.querySelectorAll('.requirements .checkbox').forEach(cb => cb.checked = false);
+            } else {
+                document.querySelectorAll('.requirements .checkbox').forEach(cb => cb.checked = true);
+            }
+        });
+
+    </script>
+</body>
+</html>
