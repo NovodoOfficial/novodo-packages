@@ -6,6 +6,7 @@
 body {
     padding: 0;
     margin: 0;
+    overflow: hidden;
     position: relative;
     min-height: 100vh;
     min-width: 100vw;
@@ -13,6 +14,10 @@ body {
     font-family: 'Gabarito';
     width: 700px;
     height: 850px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
 }
 
 .bg-art {
@@ -36,6 +41,24 @@ body {
     transition: 0.3s ease-in-out left;
 }
 
+.ext-arrow {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 30px;
+    height: auto;
+    z-index: 20;
+    cursor: pointer;
+}
+
+.ext-arrow path {
+    transition: 0.25s ease-in-out stroke;
+}
+
+.ext-arrow:hover path {
+    stroke: rgb(255, 50, 50);
+}
+
 .back-arrow path {
     transition: 0.5s ease-in-out stroke;
 }
@@ -45,7 +68,6 @@ body {
 }
 
 .back-arrow:hover {
-    /* top: 25px; */
     left: 17px;
 }
 
@@ -54,11 +76,6 @@ body {
     backdrop-filter: blur(10px);
     box-shadow: rgba(0, 0, 0, 0.5) 15px 15px 5px,
     rgba(255, 255, 255, 0.2) 5px 5px 5px inset;
-    position: absolute;
-    top: 100px;
-    bottom: 100px;
-    left: 100px;
-    right: 100px;
     display: flex;
     flex-direction: column;
     justify-content: space-evenly;
@@ -68,8 +85,8 @@ body {
     border-radius: 20px;
     padding-top: 125px;
     gap: 10px;
-    min-width: 550px;
-    max-width: 750px;
+    width: 550px;
+    height: 500px;
 }
 
 .form p {
@@ -92,7 +109,7 @@ body {
     right: 0;
 }
 
-a {
+.a {
     position: relative;
     text-decoration: none;
     color: white;
@@ -106,14 +123,31 @@ a {
     margin: 0;
     transition: 0.5s ease-in-out padding, 0.5s ease-in-out background-color;
     text-shadow: 2px 2px 5px rgba(0, 0, 0, 0);
+    cursor: pointer;
 }
 
-a:hover{
+.disabled-a {
+    position: relative;
+    text-decoration: none;
+    color: white;
+    font-size: 25px;
+    padding: 10px 20px;
+    background-color: rgb(88, 88, 88);
+    box-shadow: rgba(0, 0, 0, 0.2) 5px 5px 5px,
+    rgba(0, 0, 0, 0.1) -2px -2px 5px inset,
+    rgba(255, 255, 255, 0.2) 2px 2px 5px inset;
+    border-radius: 20px;
+    margin: 0;
+    transition: 0.5s ease-in-out padding, 0.5s ease-in-out background-color;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0);
+}
+
+.a:hover{
     padding: 10px 35px;
     background-color: #7a1bb6;
 }
 
-a::before {
+.a::before {
     content: '';
     position: absolute;
     top: -4px;
@@ -126,7 +160,7 @@ a::before {
     transition: 0.5s ease-in-out opacity, 0.5s ease-in-out background-color;
 }
 
-a:hover::before {
+.a:hover::before {
     background-color: indigo;
     transition:0.5s ease-in-out background-color;
 }
@@ -140,8 +174,40 @@ a:hover::before {
 }
 
 .checkbox {
+    appearance: none;
     width: 20px;
     height: 20px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    outline: none;
+    cursor: pointer;
+    background-color: white;
+    transition: background-color 0.3s, border-color 0.3s;
+    box-shadow: rgba(0, 0, 0, 0.2) 5px 5px 5px,
+    rgba(0, 0, 0, 0.1) -2px -2px 5px inset,
+    rgba(255, 255, 255, 0.2) 2px 2px 5px inset;
+}
+
+.checkbox:checked {
+    background-color: #71b51b;
+    border-color: #6cab1a;
+}
+.checkbox:hover {
+    background-color: rgb(207, 255, 145);
+    border-color: rgb(125, 166, 72);
+}
+
+.checkbox:disabled{
+    background-color: rgb(88, 88, 88);
+    border-color: rgb(77, 77, 77); 
+    box-shadow: rgba(0, 0, 0, 0.2) 5px 5px 5px,
+    rgba(0, 0, 0, 0.1) -2px -2px 5px inset,
+    rgba(125, 125, 125, 0.2) 2px 2px 5px inset;
+}
+
+.checkbox:disabled:hover{
+    background-color: rgb(95, 95, 95);
+    border-color: rgb(90, 90, 90); 
 }
 
 .options {
