@@ -29,12 +29,12 @@ if __name__ == '__main__':
     broadcast = config["sections"][1]["options"][0]["value"]
 
     host = '127.0.0.1'
-    message = "Hosting on http://127.0.0.1/ or \"http://localhost/\""
+    message = f"Hosting on http://127.0.0.1:{port}/ or \"http://localhost:{port}/\""
 
     if broadcast:
         host = '0.0.0.0'
         current_ip = get_current_ip()
-        message = f"Hosting on http://127.0.0.1/ or \"http://localhost/\" or {current_ip}"
+        message = f"Hosting on http://127.0.0.1:{port}/ or \"http://localhost:{port}/\" or {current_ip}"
 
     print(message)
 

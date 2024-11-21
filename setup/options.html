@@ -53,10 +53,10 @@
             </div>
         </div>
 
-        <p class="grey-out">(Already installed requirements will be ignored)</p>
+        <p class="grey-out">(Any requirements already installed will not be overridden and if on e.g. Linux, Chocolatey will not be installed)</p>
 
         <div class="buttons">
-            <p class="disabled-a">Next</p>
+            <a class="disabled-a" id="install-placeholder">Install</a>
         </div>
     </form>
 
@@ -66,8 +66,30 @@
             const allChecked = Array.from(requirementCheckboxes).every(checkbox => checkbox.checked);
 
             const requirementsCheckbox = document.getElementById('requirements');
-            
             requirementsCheckbox.checked = allChecked;
+
+            toggleInstallButton();
+        }
+
+        function toggleInstallButton() {
+            const allCheckboxes = document.querySelectorAll('.checkbox:not(:disabled)');
+            const allChecked = Array.from(allCheckboxes).every(checkbox => checkbox.checked);
+
+            const placeholder = document.getElementById('install-placeholder') || document.getElementById('install-link');
+
+            if (allChecked) {
+                placeholder.classList.remove('disabled-a');
+                placeholder.classList.add('a');
+                placeholder.id = 'install-link';
+                placeholder.textContent = 'Install';
+                placeholder.setAttribute('href', '/installation');
+            } else {
+                placeholder.classList.remove('a');
+                placeholder.classList.add('disabled-a');
+                placeholder.id = 'install-placeholder';
+                placeholder.textContent = 'Install';
+                placeholder.removeAttribute('href');
+            }
         }
 
         document.querySelectorAll('.requirements .checkbox').forEach(checkbox => {
@@ -80,8 +102,12 @@
             } else {
                 document.querySelectorAll('.requirements .checkbox').forEach(cb => cb.checked = true);
             }
+            toggleInstallButton();
         });
 
+        document.querySelectorAll('.checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', toggleInstallButton);
+        });
     </script>
 </body>
 </html>
