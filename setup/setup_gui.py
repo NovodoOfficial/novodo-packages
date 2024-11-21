@@ -5,6 +5,11 @@ import webview
 import sys
 import threading
 import subprocess
+import json
+
+install_progress = 0
+install_step = "..."
+progress_lock = threading.Lock()
 
 PORT = 8000
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -19,9 +24,8 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
         elif self.path == '/options':
             self.path = 'options.html'
         elif self.path == '/installation':
+            threading.Thread(target=install).start()
             self.path = 'installation.html'
-            install()
-            # install plugins
         elif self.path == '/done':
             self.path = 'done.html'
         elif self.path == '/exit':
@@ -30,9 +34,29 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
         elif self.path == '/launch':
             print("Launching")
             shutdown()
+        
         return super().do_GET()
 
+    def do_POST(self):
+        if self.path == '/progress':
+            print("POST request for progress received")
+
+            response = {
+                "progress": install_progress,
+                "step": f"Installing {install_step}"
+            }
+
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.end_headers()
+            self.wfile.write(json.dumps(response).encode("utf-8"))
+
+            return
+        
+        super().do_POST()
+
     def translate_path(self, path):
+        print(path)
         path = super().translate_path(path)
         return os.path.join(SCRIPT_DIR, os.path.relpath(path, os.getcwd()))
 
@@ -47,35 +71,70 @@ def install():
                 print(f"Failed to install pip: {e}")
                 shutdown()
     piptest()
+    
+    global install_progress
+    global install_step
+
+    """
+    Add installation for pip, chocolatey, nodejs
 
     requirements = [
-        "pillow"
+        {
+            "type": "custom",
+            "package": "pip"
+        },
+        {
+            "type": "pip",
+            "package": "requests"
+        },
+        {
+            "type": "pip",
+            "package": "requests"
+        }
     ]
+    """
 
-    for i in requirements:
-        os.sytem("pip install", i)
-        # feed back to html so that the text can say installing x... or update percent
-
-    dots = ["/", "──", "\\", "|"]
-
-    for a in range(50):
-        for b in dots:
-            print(f"Loading {b}")
-
-    # requirements_string = " ".join(requirements)
-
-    # os.system(f"pip install {requirements_string}")
-
+    requirements = [
+        "requests",
+        "pygithub"
+    ]
     
+    requirementCount = len(requirements)
+    requirementPercentage = 100 / requirementCount
+    requirementProgress = 0
+
+    for index, requirement in enumerate(requirements):
+        requirementCapitalize = requirement.capitalize()
+        
+        requirementStr = "Installing " + requirementCapitalize + " ..."
+        
+        requirementProgress = requirementPercentage * index
+
+        with progress_lock:
+            install_step = requirementCapitalize
+            install_progress = requirementProgress
+
+        print(f"Requirements:\n{requirementStr}\nProgress:\n{requirementProgress}")
+        
+        command = "pip install " + requirement
+
+        os.system(command)
+
+    requirementProgress = 100
+
+    print(f"Requirements:\n{requirementStr}\nProgress:\n{requirementProgress}")
+
+    with progress_lock:
+        install_progress = requirementProgress
+
+
 def shutdown(code=0):
     window.destroy()
     cleanup()
-    print("TEST")
     sys.exit(code)
 
 def cleanup():
     if httpd:
-        # fix shutdown
         httpd.server_close()
 
 def run_http_server():

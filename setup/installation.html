@@ -14,11 +14,64 @@
     <form method="POST" class="form">
 
         <h1 class="page-title">Installing</h1>
-        <h1>xx%</h1>
+        
+        <h2 id="step" class="page-subtitle"></h2>
+        <h1 id="progress"></h1>
         
         <div class="buttons">
-            <a href="done" class="a">Done</a>
+            <a class="disabled-a" id="install-placeholder">Done</a>
         </div>
+
+        <!-- ADD PROGRESS BAR/MOVEMENT -->
     </form>
+
+    <script>
+        function toggleInstallButton(installFinished) {
+            placeholder = document.getElementById('install-placeholder') || document.getElementById('install-link');
+            if (installFinished) {
+                placeholder.classList.remove('disabled-a');
+                placeholder.classList.add('a');
+                placeholder.id = 'install-link';
+                placeholder.textContent = 'Done';
+                placeholder.setAttribute('href', '/done');
+            } else {
+                placeholder.classList.remove('a');
+                placeholder.classList.add('disabled-a');
+                placeholder.id = 'install-placeholder';
+                placeholder.textContent = 'Done';
+                placeholder.removeAttribute('href');
+            }
+        }
+
+        function sendPostRequest() {
+            var installFinished = false;
+            fetch('/progress', {
+                method: 'POST',
+                headers: {
+                'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({})
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('step').textContent = data.step;    
+                document.getElementById('progress').textContent = data.progress + '%';
+
+                installFinished = false;
+
+                if (data.progress === 100) {
+                    installFinished = true;
+                    clearInterval(progressInterval)
+                }
+                
+                toggleInstallButton(installFinished);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            })
+        }
+
+        const progressInterval = setInterval(sendPostRequest, 500);
+    </script>
 </body>
 </html>
