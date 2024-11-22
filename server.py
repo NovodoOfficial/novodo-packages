@@ -7,58 +7,16 @@ import os
 import base64
 import sys
 import code
+import uuid
+import argparse
 from threading import Thread
 from io import StringIO
-from flask import Flask, render_template, redirect, jsonify, url_for, request
+from flask import Flask, render_template, redirect, jsonify, url_for, request, make_response
 from datetime import datetime
 
 print("SERVER STARTED")
 
 DEBUG_OVERIDE = True
-
-def get_logged_in_user_dir():
-    if os.name == 'nt':
-        user_dir = os.environ.get('USERPROFILE', '')
-    else:
-        user_dir = os.environ.get('HOME', '')
-
-    return user_dir
-
-user_directory = get_logged_in_user_dir()
-nov_path = os.path.join(user_directory, "novodo")
-
-script_path = os.path.abspath(__file__)
-
-target_script_path = os.path.join(nov_path, "nov.py")
-
-conditions = os.path.isdir(nov_path) and script_path == target_script_path
-
-if not conditions and not DEBUG_OVERIDE:
-    print("Missing files, install novodo with \"setup.py\" before running")
-    sys.exit(1)
-
-APPS_FOLDER = os.path.join(nov_path, "apps")
-
-OWNER = 'NovodoOfficial'
-REPO = 'novodo-template'
-FORKS_FILE = 'forks.json'
-CONFIG_FILE = 'config.json'
-
-cwd = os.getcwd()
-script_path = sys.argv[0]
-args = ' '.join(sys.argv[1:])
-
-command = f'python -u "{script_path}" {args}'
-
-timestamp = datetime.now().strftime("%m/%d/%Y %H:%M:%S.%f")[:-3]
-
-timestamp = f"{timestamp} {cwd}"
-
-command_history = [(command, timestamp, "SERVER STARTED")]
-
-app = Flask(__name__)
-
-app.jinja_env.globals.update(enumerate=enumerate)
 
 def format_date(date_str):
     try:
@@ -189,30 +147,13 @@ def save_forks(forks):
         json.dump(forks, file, indent=4)
     print(f"Saved {len(forks)} forks to {FORKS_FILE}")
 
-@app.route('/refresh')
-def refresh_forks():
-    token = load_token()
-    forks = get_forks(OWNER, REPO, token)
-    save_forks(forks)
-    return redirect('/')
+def get_logged_in_user_dir():
+    if os.name == 'nt':
+        user_dir = os.environ.get('USERPROFILE', '')
+    else:
+        user_dir = os.environ.get('HOME', '')
 
-@app.route('/')
-def index():
-    forks_data = []
-    if os.path.exists(FORKS_FILE):
-        with open(FORKS_FILE, 'r') as file:
-            forks_data = json.load(file)
-    return render_template('index.html', forks=forks_data)
-
-@app.route('/apps/<user>/<repo>/view')
-def view_app(user, repo):
-    if os.path.exists(FORKS_FILE):
-        with open(FORKS_FILE, 'r') as file:
-            forks_data = json.load(file)
-            fork_data = next((fork for fork in forks_data if fork['user'] == user and fork['repo'] == repo), None)
-            if fork_data:
-                return render_template('fork.html', fork=fork_data)
-    return 404
+    return user_dir
 
 def download_and_extract_repo(repo_url: str, download_dir: str, github_token: str):
     try:
@@ -293,6 +234,138 @@ def download(user, repo, fork_data):
 
     install_requirements_file(requirements_path)
 
+def load_config():
+    try:
+        with open(CONFIG_FILE, 'r') as f:
+            return json.load(f)
+    except:
+        return {}
+
+def save_config(config_data):
+    with open(CONFIG_FILE, 'w') as f:
+        json.dump(config_data, f, indent=4)
+
+def restart_script(restart_args=[]):
+    try:
+        print("SERVER RESTARTING")
+
+        python = sys.executable
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        app_script = os.path.join(script_dir, 'nov.py')
+
+        subprocess.Popen([python, app_script] + restart_args)
+
+        os._exit(0)
+    except Exception as e:
+        print(f"Error restarting script: {e}")
+
+user_directory = get_logged_in_user_dir()
+nov_path = os.path.join(user_directory, "novodo")
+
+script_path = os.path.abspath(__file__)
+
+target_script_path = os.path.join(nov_path, "nov.py")
+
+conditions = os.path.isdir(nov_path) and script_path == target_script_path
+
+if not conditions and not DEBUG_OVERIDE:
+    print("Missing files, install novodo with \"setup.py\" before running")
+    sys.exit(1)
+
+APPS_FOLDER = os.path.join(nov_path, "apps")
+
+OWNER = 'NovodoOfficial'
+REPO = 'novodo-template'
+FORKS_FILE = 'forks.json'
+CONFIG_FILE = 'config.json'
+
+config = load_config()
+
+password = config["sections"][2]["options"][0]["value"]
+
+PASSWORD = password
+UUID_COOKIE_NAME = "session_uuid"
+SECURE = False
+
+global_session_uuid = None
+
+cwd = os.getcwd()
+script_path = sys.argv[0]
+args = ' '.join(sys.argv[1:])
+
+command = f'python -u "{script_path}" {args}'
+
+timestamp = datetime.now().strftime("%m/%d/%Y %H:%M:%S.%f")[:-3]
+
+timestamp = f"{timestamp} {cwd}"
+
+command_history = [(command, timestamp, "SERVER STARTED")]
+
+app = Flask(__name__)
+
+app.jinja_env.globals.update(enumerate=enumerate)
+
+parser = argparse.ArgumentParser(description="Start the Flask app with optional UUID regeneration.")
+parser.add_argument('--new_uuid', action='store_true', help="Regenerate the global session UUID.")
+args = parser.parse_args()
+
+global_session_uuid_file = "session_uuid.txt"
+if args.new_uuid or not os.path.exists(global_session_uuid_file):
+    global_session_uuid = str(uuid.uuid4())
+    with open(global_session_uuid_file, 'w') as f:
+        f.write(global_session_uuid)
+else:
+    with open(global_session_uuid_file, 'r') as f:
+        global_session_uuid = f.read().strip()
+
+print(f"Global session UUID: {global_session_uuid}")
+
+def is_authenticated():
+    session_uuid = request.cookies.get(UUID_COOKIE_NAME)
+    return session_uuid == global_session_uuid
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if not PASSWORD:
+        response = make_response(redirect(url_for('index')))
+        response.set_cookie(UUID_COOKIE_NAME, global_session_uuid, httponly=True, secure=SECURE)
+        return response
+
+    if request.method == 'POST':
+        password = request.form.get('password', '')
+        if password == PASSWORD:
+            response = make_response(redirect(url_for('index')))
+            response.set_cookie(UUID_COOKIE_NAME, global_session_uuid, httponly=True, secure=SECURE)
+            return response
+        else:
+            return render_template("login.html", error="Invalid password")
+    return render_template("login.html")
+
+@app.route('/')
+def index():
+    forks_data = []
+    if os.path.exists(FORKS_FILE):
+        with open(FORKS_FILE, 'r') as file:
+            forks_data = json.load(file)
+    return render_template('index.html', forks=forks_data)
+
+@app.route('/refresh')
+def refresh_forks():
+    token = load_token()
+    forks = get_forks(OWNER, REPO, token)
+    save_forks(forks)
+    return redirect('/')
+
+@app.route('/apps/<user>/<repo>/view')
+def view_app(user, repo):
+    if os.path.exists(FORKS_FILE):
+        with open(FORKS_FILE, 'r') as file:
+            forks_data = json.load(file)
+            fork_data = next((fork for fork in forks_data if fork['user'] == user and fork['repo'] == repo), None)
+            if fork_data:
+                return render_template('fork.html', fork=fork_data)
+    return 404
+
 @app.route('/api/apps/<user>/<repo>/download')
 def download_app(user, repo):
     if os.path.exists(FORKS_FILE):
@@ -311,22 +384,12 @@ def settings():
 
     return render_template('settings.html', config=config, user_agent=user_agent)
 
-def load_config():
-    try:
-        with open(CONFIG_FILE, 'r') as f:
-            return json.load(f)
-    except:
-        return {}
-
-def save_config(config_data):
-    with open(CONFIG_FILE, 'w') as f:
-        json.dump(config_data, f, indent=4)
-
 @app.route('/api/settings/save', methods=['POST'])
 def save():
     config = load_config()
     updated = False
-    restart_needed = False
+
+    triggered_attributes = set()
 
     for section in config['sections']:
         for option in section['options']:
@@ -345,8 +408,7 @@ def save():
                         if option['value'] != value:
                             option['value'] = value
                             updated = True
-                            if 'restart_required' in option.get('attributes', []):
-                                restart_needed = True
+                            triggered_attributes.update(option.get('attributes', []))
                     else:
                         return jsonify({"error": f"Value for {option_name} must be between {min_limit} and {max_limit} characters."}), 400
 
@@ -358,8 +420,7 @@ def save():
                                 if option['value'] != value:
                                     option['value'] = value
                                     updated = True
-                                    if 'restart_required' in option.get('attributes', []):
-                                        restart_needed = True
+                                    triggered_attributes.update(option.get('attributes', []))
                             else:
                                 return jsonify({"error": f"Value for {option_name} must be between {min_limit} and {max_limit}."}), 400
                         except ValueError:
@@ -373,8 +434,7 @@ def save():
                             if option['value'] != value:
                                 option['value'] = value
                                 updated = True
-                                if 'restart_required' in option.get('attributes', []):
-                                    restart_needed = True
+                                triggered_attributes.update(option.get('attributes', []))
                         else:
                             return jsonify({"error": f"Value for {option_name} must be between {min_limit} and {max_limit}."}), 400
                     except ValueError:
@@ -385,15 +445,25 @@ def save():
                 if option['value'] != new_value:
                     option['value'] = new_value
                     updated = True
-                    if 'restart_required' in option.get('attributes', []):
-                        restart_needed = True
+                    triggered_attributes.update(option.get('attributes', []))
+
+    restart_needed = 'restart_required' in triggered_attributes
+
+    auth_update = 'auth_update' in triggered_attributes
 
     if updated:
         save_config(config)
+
+        restart_args = []
+
+        if auth_update:
+            restart_args.append("--new_uuid")
+            restart_needed = True
+
         if restart_needed:
             def restart_async():
                 time.sleep(1)
-                restart_script()
+                restart_script(restart_args)
 
             Thread(target=restart_async).start()
 
@@ -449,20 +519,6 @@ def reset_option(section, option_idx):
         return redirect(url_for('settings'))
     else:
         return redirect(url_for('settings'))
-    
-def restart_script():
-    try:
-        print("SERVER RESTARTING")
-
-        python = sys.executable
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        app_script = os.path.join(script_dir, 'nov.py')
-
-        subprocess.Popen([python, app_script])
-
-        os._exit(0)
-    except Exception as e:
-        print(f"Error restarting script: {e}")
 
 @app.route('/debug', methods=['GET', 'POST'])
 def debug_console():
@@ -558,3 +614,8 @@ def page_not_found(error):
 @app.errorhandler(401)
 def unauthorised(error):
     return render_template('401.html'), 401
+
+@app.before_request
+def require_login():
+    if request.endpoint not in ('login', 'static') and not is_authenticated():
+        return redirect(url_for('login'))

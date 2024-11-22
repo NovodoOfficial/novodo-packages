@@ -1,0 +1,83 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #121212;
+    color: white;
+    min-width: fit-content;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+}
+
+.actions {
+    text-align: center;
+}
+
+form {
+    padding: 20px;
+    width: calc(100% - 40px);
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+    min-width: fit-content;
+    max-width: 750px;
+}
+
+.top {
+    display: flex;
+    gap: 0 25px;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+    flex-wrap: wrap;
+}
+
+h1 {
+    margin: -20px 0;
+    font-size: 200px;
+}
+
+h3 {
+    margin: 0;
+    font-size: 80px;
+}
+
+p {
+    text-align: center;
+    font-size: 20px;
+}
+
+h1, h3, p {
+    word-break: keep-all;
+    white-space: nowrap;
+}
+
+button[type="submit"] {
+    padding: 10px;
+    border-radius: 10px;
+    background-color: #71b51b;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 20px;
+    width: 100%;
+}
+
+input {
+    width: calc(100% - 20px);
+    border-radius: 10px;
+    font-size: 16px;
+    border: none;
+    padding: 10px;
+    margin: 0;
+    margin-bottom: 20px;
+    background-color: #212a37;
+    color: white;
+}

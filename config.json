@@ -28,7 +28,7 @@
           "description": "Allow access by any device on the local network (use localhost or 127.0.0.1 if disabled)",
           "type": "bool",
           "input": "switch",
-          "value": false,
+          "value": true,
           "default": false,
           "attributes": [
             "restart_required"
@@ -59,14 +59,14 @@
           "description": "Set the password (empty = disabled)",
           "type": "str",
           "input": "box",
-          "value": "",
+          "value": "12345",
           "default": "",
           "limits": {
             "min": 0,
             "max": 50
           },
           "attributes": [
-            "restart_required"
+            "auth_update"
           ]
         },
         {
@@ -74,8 +74,11 @@
           "description": "Should the password be required for access to the entire site",
           "type": "bool",
           "input": "switch",
-          "value": false,
-          "default": false
+          "value": true,
+          "default": false,
+          "attributes": [
+            "auth_update"
+          ]
         },
         {
           "name": "Password for actions",
@@ -83,7 +86,10 @@
           "type": "bool",
           "input": "switch",
           "value": true,
-          "default": true
+          "default": true,
+          "attributes": [
+            "auth_update"
+          ]
         },
         {
           "name": "Password for package management",
@@ -91,7 +97,10 @@
           "type": "bool",
           "input": "switch",
           "value": true,
-          "default": true
+          "default": true,
+          "attributes": [
+            "auth_update"
+          ]
         },
         {
           "name": "Password for running",
@@ -99,7 +108,10 @@
           "type": "bool",
           "input": "switch",
           "value": true,
-          "default": true
+          "default": true,
+          "attributes": [
+            "auth_update"
+          ]
         }
       ]
     },

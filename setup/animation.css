@@ -1,6 +1,5 @@
-body {
-    opacity: 0;
-    transition: opacity 500ms ease-out;
+.form {
+    backdrop-filter: blur(10px);
 }
 
 @-moz-document url-prefix() {

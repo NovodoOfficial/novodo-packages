@@ -11,7 +11,7 @@ install_progress = 0
 install_step = "..."
 progress_lock = threading.Lock()
 
-PORT = 8000
+PORT = 49500
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 httpd = None
 
@@ -139,7 +139,6 @@ def cleanup():
 def run_http_server():
     global httpd
     httpd = socketserver.TCPServer(("", PORT), CustomHTTPRequestHandler)
-    url = f"http://localhost:{PORT}"
     httpd.serve_forever()
 
 server_thread = threading.Thread(target=run_http_server)
@@ -147,6 +146,8 @@ server_thread.daemon = True
 server_thread.start()
 
 url = f"http://localhost:{PORT}"
+
+print(f"Started at {url}")
 
 window = webview.create_window(
     'Novodo Installer',
@@ -160,5 +161,8 @@ window = webview.create_window(
 
 try:
     webview.start()
+    # print(url)
+    # while True:
+        # pass
 finally:
     cleanup()
