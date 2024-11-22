@@ -127,7 +127,6 @@ def install():
     with progress_lock:
         install_progress = requirementProgress
 
-
 def shutdown(code=0):
     window.destroy()
     cleanup()
