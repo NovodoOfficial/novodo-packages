@@ -9,24 +9,33 @@ removeCircles();
 
 const isFirefox = typeof InstallTrigger !== 'undefined';
 
-const overlay = document.createElement('div');
-overlay.style.position = 'absolute';
-overlay.style.top = 0;
-overlay.style.bottom = 0;
-overlay.style.left = 0;
-overlay.style.right = 0;
+window.addEventListener('load', () => {
+    removeCircles();
+    // document.body.style.opacity = '1';
 
-overlay.style.zIndex = 9999;
-overlay.style.backgroundColor = 'white';
-overlay.style.opacity = 1;
-overlay.style.transition = '1s ease-out opacity';
+    const overlay = document.createElement('div');
+    overlay.style.position = 'absolute';
+    overlay.style.top = 0;
+    overlay.style.bottom = 0;
+    overlay.style.left = 0;
+    overlay.style.right = 0;
 
-overlay.style.pointerEvents = 'none';
+    overlay.style.zIndex = 9999;
+    overlay.style.backgroundColor = 'white';
+    overlay.style.opacity = 1;
+    overlay.style.transition = '1s ease-out opacity';
 
-document.body.appendChild(overlay);
+    overlay.style.pointerEvents = 'none';
 
-requestAnimationFrame(() => {
-    overlay.style.opacity = 0;
+    document.body.appendChild(overlay);
+
+    requestAnimationFrame(() => {
+        overlay.style.opacity = 0;
+    });
+
+    overlay.addEventListener('transitioned', () => {
+        overlay.remove();
+    });
 });
 
 const elements = document.querySelectorAll('a, button');
