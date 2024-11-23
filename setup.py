@@ -296,7 +296,6 @@ def create_scheduled_task():
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
 
-
 def is_choco_installed():
     try:
         result = subprocess.run(["choco", "--version"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
