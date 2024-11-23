@@ -34,7 +34,7 @@ if __name__ == '__main__':
     if broadcast:
         host = '0.0.0.0'
         current_ip = get_current_ip()
-        message = f"Hosting on http://127.0.0.1:{port}/ or \"http://localhost:{port}/\" or {current_ip}"
+        message = f"Hosting on http://127.0.0.1:{port}/ or \"http://localhost:{port}/\" or \"http://{current_ip}:{port}/\""
 
     print(message)
 

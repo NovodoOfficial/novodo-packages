@@ -125,6 +125,7 @@ def install():
     print(f"Requirements:\n{requirementStr}\nProgress:\n{requirementProgress}")
 
     with progress_lock:
+        install_step = "Installation finished"
         install_progress = requirementProgress
 
 def shutdown(code=0):
