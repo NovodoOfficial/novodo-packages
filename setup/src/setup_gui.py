@@ -16,6 +16,7 @@ sys.path.insert(0, os.path.join(SCRIPT_DIR, "requirements"))
 
 try:
     import webview
+    import qrcode
 finally:
     sys.path.pop(0)
 
@@ -152,7 +153,7 @@ def install_requirement(type, package, requirementPercentage, index):
                     restart(["--restart_install"])
                     
             except Exception as e:
-                # todo Add an error message
+                print(f"Error installing pip:\n{e}")
                 shutdown()
 
         elif package == "choco":
@@ -181,8 +182,8 @@ def install_requirement(type, package, requirementPercentage, index):
                     subprocess.run(install_ps_script_cmd, check=True, shell=True)
                     
                     subprocess.run(cleanup_cmd, check=True, shell=True)
-                except subprocess.CalledProcessError as e:
-                    # print(f"Error during installation: {e}") # todo Add an error message
+                except Exception as e:
+                    print(f"Error installing choco:\n{e}")
                     shutdown()
 
             if not is_choco_installed():
@@ -196,7 +197,6 @@ def install_requirement(type, package, requirementPercentage, index):
                 try:
                     result = subprocess.run(["node", "-v"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
                     if result.returncode == 0:
-                        # print(f"Node.js is installed. Version: {result.stdout.strip()}")
                         return True
                 except FileNotFoundError:
                     return False
@@ -205,8 +205,8 @@ def install_requirement(type, package, requirementPercentage, index):
                 if OS_TYPE == "windows":
                     try:
                         subprocess.run(["choco", "install", "nodejs", "-y"], check=True)
-                    except subprocess.CalledProcessError as e:
-                        # print(f"Error during installation: {e}") # todo Add an error message
+                    except Exception as e:
+                        print(f"Error installing choco:\n{e}")
                         shutdown()
 
                 elif OS_TYPE == "linux":
@@ -219,10 +219,10 @@ def install_requirement(type, package, requirementPercentage, index):
                         elif os.path.exists("/usr/local/bin/brew"):
                             subprocess.run(["brew", "install", "node"], check=True)
                         else:
-                            # print("Unsupported package manager. Please install Node.js manually.") # todo Add an error message
+                            print(f"Unsupported package manager:\n{e}")
                             shutdown()
-                    except subprocess.CalledProcessError as e:
-                        # print(f"Error during installation: {e}") # todo Add an error message
+                    except Exception as e:
+                        print(f"Error installing choco:\n{e}")
                         shutdown()
 
                 restart(["--restart_install"])
