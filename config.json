@@ -8,7 +8,7 @@
                     "description": "Github token to remove rate limiting and increase speed",
                     "type": "str",
                     "input": "box",
-                    "value": "My secret token",
+                    "value": "",
                     "default": "",
                     "limits": {
                         "max": 50,
