@@ -1,16 +1,23 @@
-import webbrowser
+from tkinter import messagebox
 import http.server
 import socketserver
 import socket
-import os
-import sys
 import threading
 import subprocess
 import json
 import argparse
 import ctypes
-import requirements.webview as webview
-from tkinter import messagebox
+import os
+import sys
+
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+sys.path.insert(0, os.path.join(SCRIPT_DIR, "requirements"))
+
+try:
+    import webview
+finally:
+    sys.path.pop(0)
 
 def is_admin():
     try:
@@ -65,7 +72,6 @@ install_step = "..."
 progress_lock = threading.Lock()
 
 PORT = 49500
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 httpd = None
 
 if os.name == "nt":
@@ -139,14 +145,15 @@ def install_requirement(type, package, requirementPercentage, index):
             requirementCapitalize = "pip"
 
             try:
-                subprocess.check_call([sys.executable, "-m", "pip", "--version"])
-            except subprocess.CalledProcessError:
-                try:
+                result = subprocess.check_call([sys.executable, "-m", "pip", "--version"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+
+                if result.returncode != 0:
                     subprocess.check_call([sys.executable, "-m", "ensurepip", "--default-pip"])
                     restart(["--restart_install"])
-                except Exception as e:
-                    # todo Add an error message
-                    shutdown()
+                    
+            except Exception as e:
+                # todo Add an error message
+                shutdown()
 
         elif package == "choco":
             requirementCapitalize = "Chocolatey"
@@ -273,14 +280,14 @@ def install():
         install_progress = requirementProgress
 
 def shutdown(code=0):
-    # window.destroy()
+    window.destroy()
     cleanup()
     sys.exit(code)
 
 def restart(args):
     print(f"RESTARTING\nRestart args: {", ".join(args)}")
 
-    # window.destroy()
+    window.destroy()
     cleanup()
 
     try:
@@ -303,8 +310,14 @@ def cleanup():
 
 def run_http_server(ip_address):
     global httpd
-    httpd = socketserver.TCPServer((ip_address, PORT), CustomHTTPRequestHandler)
-    httpd.serve_forever()
+    print(f"Starting HTTP server at {ip_address}:{PORT}...")
+    try:
+        cleanup()
+
+        httpd = socketserver.TCPServer((ip_address, PORT), CustomHTTPRequestHandler)
+        httpd.serve_forever()
+    except Exception as e:
+        print(f"Error starting server: {e}")
 
 def get_local_ip():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -321,7 +334,7 @@ def get_local_ip():
 ip_address = '127.0.0.1'
 
 def is_headless():
-    return os.getenv("DISPLAY") is None and os.getenv("WAYLAND_DISPLAY") is None and os.getenv("MIR_SOCKET") is None
+    return os.getenv("DISPLAY") is None and os.getenv("WAYLAND_DISPLAY") is None and os.getenv("MIR_SOCKET") is None and OS_TYPE == "linux"
 
 broadcast = is_headless()
 
@@ -339,31 +352,29 @@ if restart_install:
 
 url = f"http://{ip_address}:{PORT}/{suffix}"
 
-window = webview.create_window(
-    'Novodo Installer',
-    url,
-    width=710,
-    height=780,
-    resizable=False,
-    frameless=True,
-    fullscreen=True
-)
-
 # window = webview.create_window(
 #     'Novodo Installer',
 #     url,
 #     width=710,
-#     height=780
+#     height=780,
+#     resizable=False,
+#     fullscreen=True
 # )
 
-if not restart_install and broadcast:
-    webbrowser.open(url)
+window = webview.create_window(
+    'Novodo Installer',
+    url,
+    width=710,
+    height=780
+)
 
 try:
     if not broadcast:
         webview.start()
     else:
-        print(f"A headless environment has been detected, enter this url on another device connected url")
+        if not restart_install:
+            print(f"A headless environment has been detected, enter this url on another device connected to the same network:\n{url}")
+
         while True:
             pass
 finally:
