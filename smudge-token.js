@@ -1,28 +1,27 @@
 const fs = require('fs');
 
-const configFilePath = '/dev/stdin';
+const configFilePath = './config.json';
+let configData;
 
-let data = '';
-process.stdin.on('data', chunk => {
-  data += chunk;
+try {
+  configData = JSON.parse(fs.readFileSync(configFilePath, 'utf8'));
+} catch (err) {
+  console.error('Error reading the config file:', err);
+  process.exit(1);
+}
+
+configData.sections.forEach(section => {
+  section.options.forEach(option => {
+    if (option.hasOwnProperty('default')) {
+      option.value = option.default;
+    }
+  });
 });
-process.stdin.on('end', () => {
-  try {
-    let config = JSON.parse(data);
 
-    config.sections.forEach(section => {
-      if (section.name === 'Github') {
-        section.options.forEach(option => {
-          if (option.name === 'Github token') {
-            option.value = '';
-          }
-        });
-      }
-    });
-
-    process.stdout.write(JSON.stringify(config, null, 4));
-  } catch (err) {
-    console.error('Error processing config:', err);
-    process.exit(1);
-  }
-});
+try {
+  fs.writeFileSync(configFilePath, JSON.stringify(configData, null, 4));
+  console.log('Config reset to default values successfully.');
+} catch (err) {
+  console.error('Error writing to the config file:', err);
+  process.exit(1);
+}

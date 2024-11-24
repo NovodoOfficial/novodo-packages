@@ -313,8 +313,6 @@ def cleanup():
         httpd.shutdown()
         httpd.server_close()
 
-import traceback # ! Temporary
-
 def run_http_server(ip_address):
     global httpd
     print(f"Starting HTTP server at {ip_address}:{PORT}...")
@@ -328,8 +326,6 @@ def run_http_server(ip_address):
         httpd.serve_forever()
     except Exception as e:
         print(f"Error starting server: {e}")
-        print("Traceback:")
-        traceback.print_exc()
 
 def get_local_ip():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
