@@ -17,6 +17,7 @@ sys.path.insert(0, os.path.join(SCRIPT_DIR, "requirements"))
 try:
     import webview
     import qrcode
+    from PIL import Image
 finally:
     sys.path.pop(0)
 
@@ -331,12 +332,54 @@ def get_local_ip():
         s.close()
     return ip_address
 
+def gen_qr(data, path):
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_M,
+        box_size=1,
+        border=1,
+    )
+
+    qr.add_data(data)
+    qr.make(fit=True)
+
+    img = qr.make_image(fill='black', back_color='white')
+
+    img.save(path)
+
+def display_image_in_terminal(image_path, width_multiplier=1, height_multiplier=1, invert=False):
+    blank, fill = " ", "█"
+
+    if invert:
+        blank, fill = "█", " "
+
+    img = Image.open(image_path)
+
+    img = img.convert('L')
+
+    width, height = img.size
+
+    for y in range(height):
+        row = ""
+        for x in range(width):
+            brightness = img.getpixel((x, y))
+
+            if brightness < 127:
+                row += blank * width_multiplier
+            else:
+                row += fill * width_multiplier
+        
+        for i in range(height_multiplier):
+            print(row)
+
 ip_address = '127.0.0.1'
 
 def is_headless():
     return os.getenv("DISPLAY") is None and os.getenv("WAYLAND_DISPLAY") is None and os.getenv("MIR_SOCKET") is None and OS_TYPE == "linux"
 
 broadcast = is_headless()
+
+broadcast = True
 
 if broadcast:
     ip_address = get_local_ip()
@@ -352,20 +395,13 @@ if restart_install:
 
 url = f"http://{ip_address}:{PORT}/{suffix}"
 
-# window = webview.create_window(
-#     'Novodo Installer',
-#     url,
-#     width=710,
-#     height=780,
-#     resizable=False,
-#     fullscreen=True
-# )
-
 window = webview.create_window(
     'Novodo Installer',
     url,
     width=710,
-    height=780
+    height=780,
+    resizable=False,
+    fullscreen=True
 )
 
 try:
@@ -373,7 +409,11 @@ try:
         webview.start()
     else:
         if not restart_install:
-            print(f"A headless environment has been detected, enter this url on another device connected to the same network:\n{url}")
+            print(f"A headless environment has been detected, enter this url on another device connected to the same network:\n{url}\n\nOr scan the QR code below:\n\n")
+
+            qr_path = os.path.join(SCRIPT_DIR, "qr.png")
+            gen_qr(url, qr_path)
+            display_image_in_terminal(qr_path, 2)
 
         while True:
             pass
