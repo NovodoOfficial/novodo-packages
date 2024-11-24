@@ -1,1 +1,177 @@
-Config reset to default values successfully.
+{
+    "sections": [
+        {
+            "name": "Github",
+            "options": [
+                {
+                    "name": "Github token",
+                    "description": "Github token to remove rate limiting and increase speed",
+                    "type": "str",
+                    "input": "box",
+                    "value": "",
+                    "default": "",
+                    "limits": {
+                        "max": 50,
+                        "min": 0
+                    },
+                    "attributes": [
+                        "restart_required"
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Privacy",
+            "options": [
+                {
+                    "name": "Broadcast",
+                    "description": "Allow access by any device on the local network (use localhost or 127.0.0.1 if disabled)",
+                    "type": "bool",
+                    "input": "switch",
+                    "value": false,
+                    "default": false,
+                    "attributes": [
+                        "restart_required"
+                    ]
+                },
+                {
+                    "name": "Port",
+                    "description": "Port that the site is hosted on",
+                    "type": "int",
+                    "input": "box",
+                    "value": 80,
+                    "default": 80,
+                    "limits": {
+                        "max": 65535,
+                        "min": 0
+                    },
+                    "attributes": [
+                        "restart_required"
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Security",
+            "options": [
+                {
+                    "name": "Password",
+                    "description": "Set the password (empty = disabled)",
+                    "type": "str",
+                    "input": "box",
+                    "value": "",
+                    "default": "",
+                    "limits": {
+                        "min": 0,
+                        "max": 50
+                    },
+                    "attributes": [
+                        "auth_update"
+                    ]
+                },
+                {
+                    "name": "Password for viewing",
+                    "description": "Should the password be required for access to the entire site",
+                    "type": "bool",
+                    "input": "switch",
+                    "value": false,
+                    "default": false,
+                    "attributes": [
+                        "auth_update"
+                    ]
+                },
+                {
+                    "name": "Password for actions",
+                    "description": "Should the password be required for access to refresh, notifications and debug terminal (settings is enabled by default)",
+                    "type": "bool",
+                    "input": "switch",
+                    "value": true,
+                    "default": true,
+                    "attributes": [
+                        "auth_update"
+                    ]
+                },
+                {
+                    "name": "Password for package management",
+                    "description": "Should the password be required for access to install and uninstall packages",
+                    "type": "bool",
+                    "input": "switch",
+                    "value": true,
+                    "default": true,
+                    "attributes": [
+                        "auth_update"
+                    ]
+                },
+                {
+                    "name": "Password for running",
+                    "description": "Should the password be required for access to use buttons on installed libraries",
+                    "type": "bool",
+                    "input": "switch",
+                    "value": true,
+                    "default": true,
+                    "attributes": [
+                        "auth_update"
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Server",
+            "options": [
+                {
+                    "name": "Debug console",
+                    "description": "Should the debug console be enabled",
+                    "type": "bool",
+                    "input": "switch",
+                    "value": false,
+                    "default": false,
+                    "attributes": [
+                        "restart_required"
+                    ]
+                },
+                {
+                    "name": "Console ./>_",
+                    "description": "Open the debug console",
+                    "type": "redirect",
+                    "input": "button",
+                    "value": "/debug",
+                    "style": {
+                        "bg": "#0f0087"
+                    }
+                },
+                {
+                    "name": "Restart",
+                    "description": "Restart the server",
+                    "type": "redirect",
+                    "input": "button",
+                    "value": "/api/server/restart"
+                },
+                {
+                    "name": "Stop",
+                    "description": "Stop the server",
+                    "type": "redirect",
+                    "input": "button",
+                    "value": "/api/server/stop"
+                }
+            ]
+        },
+        {
+            "name": "Danger zone",
+            "options": [
+                {
+                    "name": "Reset all",
+                    "description": "Reset all options to default values",
+                    "type": "redirect",
+                    "input": "button",
+                    "value": "/api/settings/reset/all",
+                    "style": {
+                        "bg": "red"
+                    },
+                    "attributes": [
+                        "restart_required"
+                    ]
+                }
+            ]
+        }
+    ]
+}
