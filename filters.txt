@@ -1,2 +1,0 @@
-git config filter.smudge-token.clean "node smudge-token.js"
-git config filter.smudge-token.smudge "node smudge-token.js"
