@@ -1,4 +1,3 @@
-from tkinter import messagebox
 import http.server
 import socketserver
 import socket
@@ -9,6 +8,7 @@ import argparse
 import ctypes
 import os
 import sys
+from tkinter import messagebox
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -69,6 +69,9 @@ restart_install = False
 if args.restart_install:
     restart_install = True
 
+if restart_install:
+    print("SKIPPING TO INSTALL")
+
 install_progress = 0
 install_step = "..."
 progress_lock = threading.Lock()
@@ -111,8 +114,6 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
 
     def do_POST(self):
         if self.path == '/progress':
-            print("POST request for progress received")
-
             response = {
                 "progress": install_progress,
                 "step": f"Installing {install_step}"
@@ -147,10 +148,10 @@ def install_requirement(type, package, requirementPercentage, index):
             requirementCapitalize = "pip"
 
             try:
-                result = subprocess.check_call([sys.executable, "-m", "pip", "--version"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+                result = subprocess.run([sys.executable, "-m", "pip", "--version"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
-                if result.returncode != 0:
-                    subprocess.check_call([sys.executable, "-m", "ensurepip", "--default-pip"])
+                if not result.returncode == 0:
+                    subprocess.run([sys.executable, "-m", "ensurepip", "--default-pip"])
                     restart(["--restart_install"])
                     
             except Exception as e:
@@ -281,14 +282,16 @@ def install():
         install_progress = requirementProgress
 
 def shutdown(code=0):
-    window.destroy()
+    if not broadcast:
+        window.destroy()
     cleanup()
     sys.exit(code)
 
 def restart(args):
     print(f"RESTARTING\nRestart args: {", ".join(args)}")
 
-    window.destroy()
+    if not broadcast:
+        window.destroy()
     cleanup()
 
     try:
@@ -307,7 +310,10 @@ def restart(args):
 
 def cleanup():
     if httpd:
+        httpd.shutdown()
         httpd.server_close()
+
+import traceback # ! Temporary
 
 def run_http_server(ip_address):
     global httpd
@@ -316,9 +322,14 @@ def run_http_server(ip_address):
         cleanup()
 
         httpd = socketserver.TCPServer((ip_address, PORT), CustomHTTPRequestHandler)
+
+        print("NEW INSTANCE")
+
         httpd.serve_forever()
     except Exception as e:
         print(f"Error starting server: {e}")
+        print("Traceback:")
+        traceback.print_exc()
 
 def get_local_ip():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -413,7 +424,7 @@ try:
 
             qr_path = os.path.join(SCRIPT_DIR, "qr.png")
             gen_qr(url, qr_path)
-            display_image_in_terminal(qr_path, 2)
+            display_image_in_terminal(qr_path, 2, invert=True)
 
         while True:
             pass

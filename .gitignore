@@ -1,3 +1,4 @@
 __pycache__/
 setup/src/qr.png
 session_uuid.txt
+.vscode

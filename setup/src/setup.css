@@ -4,12 +4,13 @@
 }
 
 body {
-    padding: 0;
+    padding: 20px 50px;
     margin: 0;
-    overflow: hidden;
     position: relative;
-    min-height: 100vh;
-    min-width: 100vw;
+    width: calc(100vw - 100px);
+    height: calc(100vh - 40px);
+    min-width: max-content;
+    min-height: max-content;
     color: white;
     font-family: 'Gabarito';
     display: flex;
@@ -84,6 +85,7 @@ body {
     gap: 10px;
     width: 550px;
     height: 500px;
+    flex-shrink: 0;
 }
 
 .form p {
