@@ -2,3 +2,5 @@ flask
 flask-debugtoolbar
 waitress
 pywebview
+qrcode
+pillow

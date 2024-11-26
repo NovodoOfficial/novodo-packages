@@ -386,8 +386,6 @@ def is_headless():
 
 broadcast = is_headless()
 
-broadcast = True
-
 if broadcast:
     ip_address = get_local_ip()
 
