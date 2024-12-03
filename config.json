@@ -59,7 +59,7 @@
                     "description": "Set the password (empty = disabled)",
                     "type": "str",
                     "input": "box",
-                    "value": "",
+                    "value": "My password",
                     "default": "",
                     "limits": {
                         "min": 0,
@@ -74,7 +74,7 @@
                     "description": "Should the password be required for access to the entire site",
                     "type": "bool",
                     "input": "switch",
-                    "value": false,
+                    "value": true,
                     "default": false,
                     "attributes": [
                         "auth_update"
@@ -112,6 +112,16 @@
                     "attributes": [
                         "auth_update"
                     ]
+                },
+                {
+                    "name": "Lockdown",
+                    "description": "Log out all users",
+                    "type": "redirect",
+                    "input": "button",
+                    "value": "/api/server/lockdown",
+                    "style": {
+                        "bg": "red"
+                    }
                 }
             ]
         },

@@ -1,4 +1,3 @@
-from wsgiref.headers import _HeaderList
 from waitress import serve
 from server import app
 from PIL import Image

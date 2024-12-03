@@ -607,6 +607,20 @@ def restart():
 
     return redirect(f"http://localhost:{port}/")
 
+@app.route('/api/server/lockdown')
+def lockdown():
+    def restart_async():
+        time.sleep(1)
+        restart_script(["--new_uuid"])
+
+    Thread(target=restart_async).start()
+
+    config = load_config()
+
+    port = config["sections"][1]["options"][1]["value"]
+
+    return redirect(f"http://localhost:{port}/login")
+
 @app.errorhandler(404)
 def page_not_found(error):
     return render_template('404.html'), 404
