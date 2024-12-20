@@ -226,9 +226,6 @@ class Github:
                     shutil.move(item_path, download_dir)
                 os.rmdir(extracted_folder)
                 print(f"Moved contents from {extracted_folder} to {download_dir}.")
-            
-            os.remove(zip_file_path)
-            print(f"ZIP file {zip_file_path} deleted.")
         
         except requests.exceptions.RequestException as e:
             print(f"An error occurred while downloading: {e}")
@@ -236,6 +233,11 @@ class Github:
             print(f"Failed to extract ZIP file: {e}")
         except Exception as e:
             print(f"An unexpected error occurred: {e}")
+        finally:
+            if os.path.exists(zip_file_path):
+                os.remove(zip_file_path)
+            if os.path.exists(extracted_folder):
+                shutil.rmtree(extracted_folder)
         
     def get_repo_size(owner, repo_name, token=None):
         url = f"https://api.github.com/repos/{owner}/{repo_name}"
