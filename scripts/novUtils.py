@@ -217,10 +217,13 @@ class Github:
             if os.path.exists(extracted_folder):
                 for item in os.listdir(extracted_folder):
                     item_path = os.path.join(extracted_folder, item)
-                    if os.path.isdir(item_path):
-                        shutil.move(item_path, download_dir)
-                    else:
-                        shutil.move(item_path, download_dir)
+                    dest_path = os.path.join(download_dir, item)
+                    if os.path.exists(dest_path):
+                        if os.path.isdir(dest_path):
+                            shutil.rmtree(dest_path)
+                        else:
+                            os.remove(dest_path)
+                    shutil.move(item_path, download_dir)
                 os.rmdir(extracted_folder)
                 print(f"Moved contents from {extracted_folder} to {download_dir}.")
             
@@ -378,22 +381,52 @@ LOGGING_LEVEL = logging.INFO
 if DEBUG:
     LOGGING_LEVEL = logging.DEBUG
 
+# G====================================================================================================== BRANDING =====G #
+
+class Branding:
+    HEX = "71b51b"
+    ANSI = Markdown.hex_to_ansi(HEX)
+
+    BANNER = """
+
+██      ██  ██████████  ██      ██
+████    ██  ██      ██  ██      ██
+██  ██  ██  ██      ██  ██      ██
+██    ████  ██      ██    ██  ██
+██      ██  ██████████      ██
+
+██████████  ████████    ██████████
+██      ██  ██      ██  ██      ██
+██      ██  ██      ██  ██      ██
+██      ██  ██      ██  ██      ██
+██████████  ████████    ██████████
+
+""".strip()
+
 # V==================================================================================================== CONSTANTS =====V #
 
 # O====================================================================================================== LOGGING =====O #
 
 logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(message)s",
+    level=LOGGING_LEVEL,
+    format="%(message)s",
     handlers=[
-        logging.FileHandler(LOGGING_PATH),
-        logging.StreamHandler()
-    ] if any([logging.FileHandler, logging.StreamHandler]) else None
+        logging.StreamHandler(),
+        logging.FileHandler(LOGGING_PATH, encoding='utf-8')  # FileHandler with timestamp
+    ]
 )
 
-def on_exit():
-    logging.debug("Script exited")
+file_handler = logging.FileHandler(LOGGING_PATH, encoding='utf-8')
+file_handler.setFormatter(logging.Formatter('%(asctime)s - %(message)s'))
 
-atexit.register(on_exit)
+logging.getLogger().handlers[1] = file_handler
+
+exit_called = False
+
+def on_exit():
+    global exit_called
+    if not exit_called:
+        logging.debug("Script exited")
+        exit_called = True
 
 # O====================================================================================================== LOGGING =====O #

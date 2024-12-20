@@ -18,7 +18,7 @@ def main():
     args = sys.argv[1:]
 
     if len(args) == 0:
-        utils.logging.info(f"Novodo Packages v0.0.1 from \"{utils.SCRIPT_PATH}\"")
+        utils.logging.info(f"Novodo Packages v0.0.1 from \"{utils.SCRIPT_PATH}\"\n{utils.Branding.ANSI}\n{utils.Branding.BANNER}\n{utils.Markdown.RESET}")
 
         sys.exit(0)
 

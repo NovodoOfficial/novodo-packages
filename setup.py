@@ -44,11 +44,24 @@ def mainSetup():
         utils = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(utils)
 
-        repo_url = f"https://raw.githubusercontent.com/{owner}/{repo}/"
+    NOVODO_DIR = utils.NOVODO_DIR
 
-        utils.Github.download_and_extract_repo(repo_url, temp_dir, branch)
+    if os.path.isfile(NOVODO_DIR):
+        print(f"File found at, \"{NOVODO_DIR}\2, remove it? ([Y]es/[N]o)")
 
-    print("Temporary directory and its contents have been cleaned up.")
+        if utils.get_input().lower() in utils.Y_LIST:
+            os.remove(NOVODO_DIR)
+            print(f"File removed: {NOVODO_DIR}")
+
+        else:
+            print("File not removed, exiting...")
+            sys.exit(1)
+
+    os.makedirs(NOVODO_DIR, exist_ok=True)
+
+    repo_url = f"https://raw.githubusercontent.com/{owner}/{repo}/"
+
+    utils.Github.download_and_extract_repo(repo_url, NOVODO_DIR, branch)
 
 # M========================================================================================================= MAIN =====M #
 
