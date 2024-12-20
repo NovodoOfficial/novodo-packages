@@ -1,0 +1,36 @@
+{
+    "name": "General config",
+    "description": "Built in config options for Packages",
+    "options": {
+        "github": {
+            "name": "Github",
+            "description": "Github options",
+            "options": {
+                "token": {
+                    "name": "Github Token",
+                    "description": "Use your Github token to get faster download speeds and remove rate limits",
+                    "value": null,
+                    "default": null
+                }
+            }
+        },
+        "startup": {
+            "name": "Startup",
+            "description": "Startup options",
+            "options": {
+                "enabled": {
+                    "name": "Startup launch",
+                    "description": "Launch Packages on startup",
+                    "value": false,
+                    "default": false
+                },
+                "hidden": {
+                    "name": "Hide startup",
+                    "description": "Don't show the terminal window on startup",
+                    "value": false,
+                    "default": true
+                }
+            }
+        }
+    }
+}
