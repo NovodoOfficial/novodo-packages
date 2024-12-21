@@ -41,7 +41,7 @@ def mainSetup():
     owner = "NovodoOfficial"
     repo = "novodo-packages"
     branch = "main"
-    filepath = "scripts/novUtils.py"
+    filepath = "src/scripts/novUtils.py"
 
     content = fetch_github_file(owner, repo, branch, filepath)
     
