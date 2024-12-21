@@ -108,10 +108,9 @@ def mainComments():
 # R========================================================================================================== RUN =====R #
 
 if __name__ == "__main__":
-    utils.atexit.register(utils.on_exit)
     try:
         mainComments()
-        
+
     except KeyboardInterrupt:
         print("KeyboardInterrupt Exit")
         sys.exit(0)

@@ -2,15 +2,15 @@
 
 # I====================================================================================================== IMPORTS =====I #
 
-import traceback
 import requests
 import platform
 import logging
 import shutil
-import atexit
+import signal
 import json
 import sys
 import os
+import atexit
 
 # I====================================================================================================== IMPORTS =====I #
 
@@ -179,7 +179,7 @@ class Github:
             import requests
             import zipfile
         except ImportError as e:
-            print(f"Error importing libraries: {e}")
+            logging.error(f"Error importing libraries: {e}")
             return
 
         parts = repo_url.rstrip("/").split("/")
@@ -197,19 +197,19 @@ class Github:
         zip_file_path = os.path.join(download_dir, f"{repo_name}.zip")
 
         if os.path.exists(zip_file_path):
-            print(f"Overwriting {zip_file_path}.")
+            logging.info(f"Overwriting {zip_file_path}.")
             os.remove(zip_file_path)
 
         try:
-            print(f"Downloading {repo_name} repository...")
+            logging.info(f"Downloading {repo_name} repository...")
             response = requests.get(api_url, headers=headers)
             response.raise_for_status()
             
             with open(zip_file_path, "wb") as file:
                 file.write(response.content)
-            print(f"Repository {repo_name} downloaded successfully as ZIP.")
+            logging.info(f"Repository {repo_name} downloaded successfully as ZIP.")
             
-            print("Extracting ZIP file...")
+            logging.info("Extracting ZIP file...")
             with zipfile.ZipFile(zip_file_path, "r") as zip_ref:
                 zip_ref.extractall(download_dir)
             
@@ -219,20 +219,21 @@ class Github:
                     item_path = os.path.join(extracted_folder, item)
                     dest_path = os.path.join(download_dir, item)
                     if os.path.exists(dest_path):
+                        logging.info(f"Overwriting {dest_path}.")
                         if os.path.isdir(dest_path):
                             shutil.rmtree(dest_path)
                         else:
                             os.remove(dest_path)
                     shutil.move(item_path, download_dir)
                 os.rmdir(extracted_folder)
-                print(f"Moved contents from {extracted_folder} to {download_dir}.")
+                logging.info(f"Moved contents from {extracted_folder} to {download_dir}.")
         
         except requests.exceptions.RequestException as e:
-            print(f"An error occurred while downloading: {e}")
+            logging.error(f"An error occurred while downloading: {e}")
         except zipfile.BadZipFile as e:
-            print(f"Failed to extract ZIP file: {e}")
+            logging.error(f"Failed to extract ZIP file: {e}")
         except Exception as e:
-            print(f"An unexpected error occurred: {e}")
+            logging.error(f"An unexpected error occurred: {e}")
         finally:
             if os.path.exists(zip_file_path):
                 os.remove(zip_file_path)
@@ -383,7 +384,7 @@ LOGGING_LEVEL = logging.INFO
 if DEBUG:
     LOGGING_LEVEL = logging.DEBUG
 
-# G====================================================================================================== BRANDING =====G #
+# G===================================================================================================== BRANDING =====G #
 
 class Branding:
     HEX = "71b51b"
@@ -409,12 +410,21 @@ class Branding:
 
 # O====================================================================================================== LOGGING =====O #
 
+exit_called = False
+session_logs = []
+exit_logged = False
+
+class InMemoryHandler(logging.Handler):
+    def emit(self, record):
+        session_logs.append(self.format(record))
+
 logging.basicConfig(
     level=LOGGING_LEVEL,
     format="%(message)s",
     handlers=[
         logging.StreamHandler(),
-        logging.FileHandler(LOGGING_PATH, encoding='utf-8')  # FileHandler with timestamp
+        logging.FileHandler(LOGGING_PATH, encoding='utf-8'),
+        InMemoryHandler()
     ]
 )
 
@@ -423,12 +433,15 @@ file_handler.setFormatter(logging.Formatter('%(asctime)s - %(message)s'))
 
 logging.getLogger().handlers[1] = file_handler
 
-exit_called = False
-
-def on_exit():
-    global exit_called
-    if not exit_called:
+def handle_exit(signum=None, frame=None):
+    global exit_called, exit_logged
+    if not exit_called and not exit_logged:
         logging.debug("Script exited")
         exit_called = True
+        exit_logged = True
+
+signal.signal(signal.SIGINT, handle_exit)
+signal.signal(signal.SIGTERM, handle_exit)
+atexit.register(handle_exit)
 
 # O====================================================================================================== LOGGING =====O #
