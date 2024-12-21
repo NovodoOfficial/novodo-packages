@@ -254,8 +254,8 @@ class Github:
             print(f"Error: {response.status_code}")
             return None
 
-    def get_token(config_path):
-        config = Config.load(CONFIG_DIR)
+    def get_token(config_dir):
+        config = Config.load(config_dir)
         adress = "system/github/token"
         token = Config.get_option(adress, config)
 
