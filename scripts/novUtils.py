@@ -2,21 +2,29 @@
 
 # I====================================================================================================== IMPORTS =====I #
 
+import traceback
 import requests
 import platform
 import logging
 import shutil
 import signal
+import atexit
 import json
 import sys
 import os
-import atexit
 
 # I====================================================================================================== IMPORTS =====I #
 
 # F==================================================================================================== FUNCTIONS =====F #
 
-def clearScreen():
+def set_window_title(title):
+    system = platform.system()
+    if system == "Windows":
+        os.system(f"title {title}")
+    elif system in ["Linux", "Darwin"]:
+        sys.stdout.write(f"\x1b]2;{title}\x07")
+
+def clear_screen():
     system = platform.system()
 
     if system == "Windows":
@@ -277,6 +285,16 @@ class Markdown:
     UNDERLINE = "\033[4m"
     RESET = "\033[0m"
 
+    class Color:
+        BLACK = "\033[30m"
+        RED = "\033[31m"
+        GREEN = "\033[32m"
+        YELLOW = "\033[33m"
+        BLUE = "\033[34m"
+        MAGENTA = "\033[35m"
+        CYAN = "\033[36m"
+        WHITE = "\033[37m"
+
     def hex_to_ansi(hex_color):
         if hex_color.startswith("#"):
             hex_color = hex_color[1:]
@@ -405,6 +423,10 @@ class Branding:
 ██████████  ████████    ██████████
 
 """.strip()
+    
+# G===================================================================================================== SYSTEM =====G #
+
+VERSION = "0.0.1"
 
 # V==================================================================================================== CONSTANTS =====V #
 

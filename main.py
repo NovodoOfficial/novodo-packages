@@ -12,13 +12,62 @@ import os
 
 # I====================================================================================================== IMPORTS =====I #
 
+# V==================================================================================================== CONSTANTS =====V #
+
+Markdown = utils.Markdown
+Color = Markdown.Color
+Color.RESET = Markdown.RESET
+Branding = utils.Branding
+
+# V==================================================================================================== CONSTANTS =====V #
+
+# F==================================================================================================== FUNCTIONS =====F #
+
+def interactive_console():
+    utils.set_window_title("Novodo Packages Console")
+
+    input_string = f"{Branding.ANSI}{utils.SCRIPT_PATH}{Color.BLUE}>{Color.RESET} "
+
+    while True:
+        command = input(input_string).strip()
+
+        executed = False
+
+        console_commands = ["clear", "cls", "exit", "quit"]
+
+        if command in ["exit", "quit"]:
+            break
+        elif command in ["clear", "cls"]:
+            utils.clear_screen()
+
+        if command in console_commands:
+            continue
+
+        command_file = os.path.join(utils.SCRIPT_DIR, "scripts", f"{command}.py")
+
+        if os.path.isfile(command_file):
+            subprocess.run([sys.executable, command_file])
+        else:
+            utils.logging.error(f"{Color.RED}Error:{Color.RESET}\nCommand {Color.RED}\"{Color.BLUE}{command}{Color.RED}\"{Color.RESET} does not exist or is not found at expected location: {Color.RED}\"{Color.BLUE}{command_file}{Color.RED}\"{Color.RESET}")
+
+# F==================================================================================================== FUNCTIONS =====F #
+
 # M========================================================================================================= MAIN =====M #
 
 def main():
     args = sys.argv[1:]
 
     if len(args) == 0:
-        utils.logging.info(f"Novodo Packages v0.0.1 from \"{utils.SCRIPT_PATH}\"\n{utils.Branding.ANSI}\n{utils.Branding.BANNER}\n{utils.Markdown.RESET}")
+        use_interactive_console = True
+    elif len(args) == 1:
+        if args[0] in ["--console", "console"]:
+            use_interactive_console = True
+
+    if use_interactive_console:
+        message = f"{Branding.ANSI}Novodo Packages {Color.RESET}iteractive console {Color.BLUE}v{utils.VERSION}{Color.RESET} from {Color.RED}\"{Color.BLUE}{utils.SCRIPT_PATH}{Color.RED}\"{Color.RESET}\n{Branding.ANSI}\n{Branding.BANNER}\n{Color.RESET}\nType {Color.RED}\"{Color.BLUE}exit{Color.RED}\"{Color.RESET} or {Color.RED}\"{Color.BLUE}quit{Color.RED}\"{Color.RESET} to quit\n"
+
+        utils.logging.info(message)
+        interactive_console()
 
         sys.exit(0)
 
@@ -60,4 +109,3 @@ if __name__ == "__main__":
         raise
 
 # R========================================================================================================== RUN =====R #
-
