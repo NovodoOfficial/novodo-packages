@@ -54,7 +54,6 @@ def mainInstall():
 # R========================================================================================================== RUN =====R #
 
 if __name__ == "__main__":
-    utils.atexit.register(utils.on_exit)
     try:
         mainInstall()
         

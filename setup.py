@@ -20,11 +20,24 @@ def fetch_github_file(owner, repo, branch, filepath):
     except urllib.error.HTTPError as e:
         raise Exception(f"Error fetching file: {e.code}")
 
+def get_logged_in_user_dir():
+    if os.name == "nt":
+        user_dir = os.environ.get("USERPROFILE", "")
+    else:
+        user_dir = os.environ.get("HOME", "")
+
+    return user_dir
+
 # F==================================================================================================== FUNCTIONS =====F #
 
 # M========================================================================================================= MAIN =====M #
 
 def mainSetup():
+    USER_DIR = get_logged_in_user_dir()
+    NOVODO_DIR = os.path.join(USER_DIR, ".novodo")
+    
+    os.makedirs(NOVODO_DIR, exist_ok=True)
+
     owner = "NovodoOfficial"
     repo = "novodo-packages"
     branch = "main"
@@ -44,8 +57,6 @@ def mainSetup():
         utils = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(utils)
 
-    NOVODO_DIR = utils.NOVODO_DIR
-
     if os.path.isfile(NOVODO_DIR):
         print(f"File found at, \"{NOVODO_DIR}\2, remove it? ([Y]es/[N]o)")
 
@@ -56,8 +67,6 @@ def mainSetup():
         else:
             print("File not removed, exiting...")
             sys.exit(1)
-
-    os.makedirs(NOVODO_DIR, exist_ok=True)
 
     repo_url = f"https://raw.githubusercontent.com/{owner}/{repo}/"
 
