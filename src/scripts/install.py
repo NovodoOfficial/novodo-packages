@@ -33,6 +33,12 @@ def mainInstall():
     if len(args) == 3:
         branch = args[2]
 
+    token = utils.Github.get_token(utils.CONFIG_DIR)
+
+    if not utils.Github.repo_exists(package_owner, package_name, token):
+        utils.logging.error(f"Repository {package_owner}/{package_name} does not exist.")
+        sys.exit(1)
+
     repo_size_kb = utils.Github.get_repo_size(package_owner, package_name)
 
     repo_size_formatted = utils.format_size(repo_size_kb)
@@ -49,8 +55,6 @@ def mainInstall():
         os.makedirs(f"{user_folder}/{package_name}", exist_ok=True)
 
         utils.logging.info(f"Installing \"{package_name}\" to \"{repo_folder}\"")
-
-        token = utils.Github.get_token(utils.CONFIG_DIR)
 
         utils.Github.download_and_extract_repo(repo_url, repo_folder, branch, token)
 

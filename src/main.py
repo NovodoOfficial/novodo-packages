@@ -7,6 +7,7 @@ import scripts.novUtils as utils
 # I================================================================================================ OTHER IMPORTS =====I #
 
 import subprocess
+import shlex
 import sys
 import os
 
@@ -29,9 +30,14 @@ def interactive_console():
     input_string = f"{Branding.ANSI}{utils.SCRIPT_PATH}{Color.BLUE}>{Color.RESET} "
 
     while True:
-        command = input(input_string).strip()
+        command_line = input(input_string).strip()
+        command_args = shlex.split(command_line)
 
-        executed = False
+        if not command_args:
+            continue
+
+        command = command_args[0]
+        args = command_args[1:]
 
         console_commands = ["clear", "cls", "exit", "quit"]
 
@@ -46,7 +52,7 @@ def interactive_console():
         command_file = os.path.join(utils.SCRIPT_DIR, "scripts", f"{command}.py")
 
         if os.path.isfile(command_file):
-            subprocess.run([sys.executable, command_file])
+            subprocess.run([sys.executable, command_file, *args])  # Pass args to subprocess
         else:
             utils.logging.error(f"{Color.RED}Error:{Color.RESET}\nCommand {Color.RED}\"{Color.BLUE}{command}{Color.RED}\"{Color.RESET} does not exist or is not found at expected location: {Color.RED}\"{Color.BLUE}{command_file}{Color.RED}\"{Color.RESET}")
 

@@ -269,6 +269,14 @@ class Github:
 
         return token
 
+    def repo_exists(owner, repo_name, token=None):
+        url = f"https://api.github.com/repos/{owner}/{repo_name}"
+        headers = {}
+        if token:
+            headers["Authorization"] = f"token {token}"
+        response = requests.get(url, headers=headers)
+        return response.status_code == 200
+
 class Files:
     def rm_dir_file(path):
         if os.path.exists(path):
@@ -356,19 +364,21 @@ class Markdown:
 
 DEBUG = False
 
-# G======================================================================================================= SCRIPT =====G #
-
-SCRIPT_NAME, SCRIPT_DIR, SCRIPT_PATH = get_script_info()                              # ? Info and locations of the script
-UTILS_DIR                            = os.path.dirname(os.path.abspath(__file__))     # ? Directory of this file
-
 # G========================================================================================================= USER =====G #
 
 USER_DIR                             = get_logged_in_user_dir()                       # ? Directory for the current user
 NOVODO_DIR                           = os.path.join(USER_DIR, ".novodo")              # ? Directory for Novodo
 
+# G======================================================================================================= SCRIPT =====G #
+
+SCRIPT_NAME, SCRIPT_DIR, SCRIPT_PATH = get_script_info()                              # ? Info and locations of the script
+UTILS_DIR                            = os.path.dirname(os.path.abspath(__file__))     # ? Directory of this file
+
+SRC_DIR                              = os.path.join(NOVODO_DIR, "src")                # ? Directory of the src folder
+
 # G======================================================================================================= CONFIG =====G #
 
-CONFIG_DIR                           = os.path.join(NOVODO_DIR, "config")             # ? Directory for config json tempate
+CONFIG_DIR                           = os.path.join(SRC_DIR, "config")                # ? Directory for config json tempate
 CONFIG_TEMPLATE                      = Config.generate_template(CONFIG_DIR)           # ? Config json tempate
 
 # G===================================================================================================== PACKAGES =====G #
