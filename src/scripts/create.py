@@ -65,9 +65,8 @@ def clear_row():
     
     sys.stdout.write("\r" + " " * width + "\r")
 
-def create_package(options, config_dir):
-
-    pass
+def create_package(options, token):
+    utils.Github.fork_repo(utils.Github.USER, utils.Github.TEMPLATE, token)
 
 # F==================================================================================================== FUNCTIONS =====F #
 
@@ -79,7 +78,7 @@ def mainCreate():
     token = utils.Github.get_token(utils.CONFIG_DIR)
 
     if not token:
-        utils.logging.error(f"{Color.RED}✗{Color.RESET} No GitHub token found. Please run {Color.RED}\"nov config token <token>{Color.RESET}\"")
+        utils.logging.error(f"{Color.RED}✗{Color.RESET} No GitHub token found. Please run {Color.RED}\"{Color.BLUE}nov config token <token>{Color.RED}\"{Color.RESET}")
         sys.exit(1)
 
     questions = {
@@ -127,7 +126,7 @@ def mainCreate():
         done += " " * (max(len(question_string) - len(done), 0))
         utils.logging.info(done)
 
-    create_package(options, utils.CONFIG_DIR)
+    create_package(options, token)
 
     spin(3, f"Finishing creation of {Color.RED}\"{Color.BLUE}{options['project_name']}{Color.RED}\"", f"{Color.GREEN}✓{Color.RESET} Created {Color.RED}\"{Color.BLUE}{options['project_name']}{Color.RED}\"{Color.RESET}")
 

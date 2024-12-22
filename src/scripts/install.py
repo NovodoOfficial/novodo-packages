@@ -24,7 +24,7 @@ def mainInstall():
 
     if len(args) == 1:
         package_name = package_owner
-        package_owner = "NovodoOfficial"
+        package_owner = utils.Github.USER
     else:
         package_name = args[1]
 

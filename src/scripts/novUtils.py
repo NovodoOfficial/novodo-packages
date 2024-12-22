@@ -199,6 +199,10 @@ class Config:
         return config
 
 class Github:
+    USER = "NovodoOfficial"
+    REPO = "novodo-packages"
+    TEMPLATE = "novodo-template"
+
     def download_and_extract_repo(repo_url, download_dir, branch, github_token=None):
         try:
             import requests
@@ -304,6 +308,26 @@ class Github:
         if response.status_code == 200:
             user_data = response.json()
             return user_data.get("login")
+        else:
+            response.raise_for_status()
+
+    def fork_repo(repo_name, owner, new_name, token=None):
+        url = f"https://api.github.com/repos/{owner}/{repo_name}/forks"
+        
+        headers = {
+            "Accept": "application/vnd.github.v3+json"
+        }
+        if token:
+            headers["Authorization"] = f"token {token}"
+
+        data = {
+            "name": new_name
+        }
+        
+        response = requests.post(url, headers=headers, json=data)
+        
+        if response.status_code == 202:
+            return response.json()
         else:
             response.raise_for_status()
 
