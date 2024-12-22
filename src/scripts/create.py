@@ -66,7 +66,7 @@ def clear_row():
     sys.stdout.write("\r" + " " * width + "\r")
 
 def create_package(options, token):
-    utils.Github.fork_repo(utils.Github.TEMPLATE, utils.Github.REPO, options["package_name"], token)
+    utils.Github.fork_repo(utils.Github.TEMPLATE, utils.Github.USER, options["package_name"], token)
 
 # F==================================================================================================== FUNCTIONS =====F #
 
