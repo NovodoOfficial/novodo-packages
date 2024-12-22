@@ -66,7 +66,7 @@ def clear_row():
     sys.stdout.write("\r" + " " * width + "\r")
 
 def create_package(options, token):
-    utils.Github.fork_repo(utils.Github.USER, utils.Github.TEMPLATE, token)
+    utils.Github.fork_repo(utils.Github.USER, utils.Github.TEMPLATE, options["package_name"], token)
 
 # F==================================================================================================== FUNCTIONS =====F #
 
@@ -82,7 +82,7 @@ def mainCreate():
         sys.exit(1)
 
     questions = {
-        "project_name": {
+        "package_name": {
             "question": "What is the name of your package?",
             "type": "string"
         }
