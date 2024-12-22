@@ -1,0 +1,25 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Format CURRENT file comments",
+            "type": "shell",
+            "command": "python",
+            "args": [".vscode/comments.py", "${file}", "120", "r"],
+            "presentation": {
+                "reveal": "silent" 
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Format ALL file comments in dir",
+            "type": "shell",
+            "command": "python",
+            "args": [".vscode/comments.py", "${cwd}", "120", "r", ".git", "myToken.md", "README.md"],
+            "presentation": {
+                "reveal": "silent" 
+            },
+            "problemMatcher": []
+        }
+    ]
+}

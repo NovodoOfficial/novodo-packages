@@ -70,6 +70,23 @@ def get_input(text=""):
     logging.debug(f"USER INPUT: {user_input}")
     return user_input
 
+class MoveCursor:
+    def up(lines=1):
+        sys.stdout.write(f"\033[{lines}A")
+        sys.stdout.flush()
+    
+    def down(lines=1):
+        sys.stdout.write(f"\033[{lines}B")
+        sys.stdout.flush()
+    
+    def right(chars=1):
+        sys.stdout.write(f"\033[{chars}C")
+        sys.stdout.flush()
+    
+    def left(chars=1):
+        sys.stdout.write(f"\033[{chars}D")
+        sys.stdout.flush()
+
 class Config:
     def load(config_dir):
         try:
@@ -298,7 +315,8 @@ class Markdown:
         RED = "\033[31m"
         GREEN = "\033[32m"
         YELLOW = "\033[33m"
-        BLUE = "\033[34m"
+        DARK_BLUE = "\033[34m"
+        BLUE = "\033[94m"
         MAGENTA = "\033[35m"
         CYAN = "\033[36m"
         WHITE = "\033[37m"
@@ -400,6 +418,8 @@ N_LIST = ["n", "no"]
 CANCEL_LIST = ["c", "cancel"]
 
 BACKUP_LIST = ["b", "backup"]
+
+EXIT_LIST = ["exit", "quit"]
 
 # G====================================================================================================== LOGGING =====G #
 

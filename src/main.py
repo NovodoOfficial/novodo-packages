@@ -39,9 +39,9 @@ def interactive_console():
         command = command_args[0]
         args = command_args[1:]
 
-        console_commands = ["clear", "cls", "exit", "quit"]
+        console_commands = ["clear", "cls"] + utils.EXIT_LIST
 
-        if command in ["exit", "quit"]:
+        if command in utils.EXIT_LIST:
             break
         elif command in ["clear", "cls"]:
             utils.clear_screen()
