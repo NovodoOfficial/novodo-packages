@@ -38,8 +38,8 @@ def mainSetup():
 
     os.makedirs(NOVODO_DIR, exist_ok=True)
 
-    owner = utils.Github.USER
-    repo = utils.Github.REPO
+    owner = "NovodoOfficial"
+    repo = "novodo-packages"
     branch = "main"
     filepath = "src/scripts/novUtils.py"
 
