@@ -35,8 +35,6 @@ def mainUninstall():
     user_folder = os.path.join(utils.PACKAGES_FOLDER, package_owner)
     repo_folder = os.path.join(user_folder, package_name)
 
-    print(repo_folder)
-
     if not os.path.exists(repo_folder):
         utils.logging.error(f"Repository {package_owner}/{package_name} does not exist.")
         sys.exit(1)
