@@ -43,7 +43,7 @@ def mainConfig():
 
         config = utils.Config.load(utils.CONFIG_DIR)
 
-        config = utils.Config.set_option("system/github/toekn", args[1], config)
+        config = utils.Config.set_option("system/github/token", args[1], config)
 
         utils.Config.save(utils.CONFIG_DIR, config)
 
