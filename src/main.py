@@ -62,6 +62,7 @@ def interactive_console():
 
 def main():
     args = sys.argv[1:]
+    use_interactive_console = False
 
     if len(args) == 0:
         use_interactive_console = True
