@@ -16,7 +16,7 @@ import os
 def mainInstall():
     args = sys.argv[1:]
 
-    if not len(args) in [1, 2, 3]:
+    if not len(args) in [1, 2]:
         utils.logging.error(f"Invalid arguments for install: {args}")
         sys.exit(1)
 
@@ -27,11 +27,6 @@ def mainInstall():
         package_owner = "NovodoOfficial"
     else:
         package_name = args[1]
-
-    branch = "main"
-    
-    if len(args) == 3:
-        branch = args[2]
 
     token = utils.Github.get_token(utils.CONFIG_DIR)
 
@@ -56,6 +51,7 @@ def mainInstall():
 
         utils.logging.info(f"Installing \"{package_name}\" to \"{repo_folder}\"")
 
+        branch = "main"
         utils.Github.download_and_extract_repo(repo_url, repo_folder, branch, token)
 
 # M========================================================================================================= MAIN =====M #

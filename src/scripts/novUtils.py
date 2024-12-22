@@ -293,6 +293,19 @@ class Github:
             headers["Authorization"] = f"token {token}"
         response = requests.get(url, headers=headers)
         return response.status_code == 200
+    
+    def get_token_owner(token):
+        url = "https://api.github.com/user"
+        headers = {
+            "Authorization": f"token {token}"
+        }
+        response = requests.get(url, headers=headers)
+        
+        if response.status_code == 200:
+            user_data = response.json()
+            return user_data.get("login")
+        else:
+            response.raise_for_status()
 
 class Files:
     def rm_dir_file(path):
@@ -320,6 +333,7 @@ class Markdown:
         MAGENTA = "\033[35m"
         CYAN = "\033[36m"
         WHITE = "\033[37m"
+        RESET = "\033[0m"
 
     def hex_to_ansi(hex_color):
         if hex_color.startswith("#"):

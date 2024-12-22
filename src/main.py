@@ -17,7 +17,6 @@ import os
 
 Markdown = utils.Markdown
 Color = Markdown.Color
-Color.RESET = Markdown.RESET
 Branding = utils.Branding
 
 # V==================================================================================================== CONSTANTS =====V #
@@ -71,8 +70,16 @@ def main():
             use_interactive_console = True
 
     if use_interactive_console:
-        message = f"{Branding.ANSI}Novodo Packages {Color.RESET}iteractive console {Color.BLUE}v{utils.VERSION}{Color.RESET} from {Color.RED}\"{Color.BLUE}{utils.SCRIPT_PATH}{Color.RED}\"{Color.RESET}\n{Branding.ANSI}\n{Branding.BANNER}\n{Color.RESET}\nType {Color.RED}\"{Color.BLUE}exit{Color.RED}\"{Color.RESET} or {Color.RED}\"{Color.BLUE}quit{Color.RED}\"{Color.RESET} to quit\n"
+        message = f"""{Branding.ANSI}Novodo Packages {Color.RESET}iteractive console {Color.BLUE}v{utils.VERSION}{Color.RESET} from {Color.RED}"{Color.BLUE}{utils.SCRIPT_PATH}{Color.RED}"{Color.RESET}
+{Branding.ANSI}
+{Branding.BANNER}
+{Color.RESET}
+Type {Color.RED}"{Color.BLUE}exit{Color.RED}"{Color.RESET} or {Color.RED}"{Color.BLUE}quit{Color.RED}"{Color.RESET} to quit
 
+{Color.CYAN}Note:{Color.RESET}
+The {Color.RED}"{Color.BLUE}nov{Color.RED}"{Color.RESET} prefix is not required for commands in the console
+"""
+        
         utils.logging.info(message)
         interactive_console()
 
@@ -92,9 +99,9 @@ def main():
         sys.exit(0)
     
     if os.path.isdir(SCRIPTS_FOLDER_DIR):
-        utils.logging.error(f"Command \"{command}\" does not exist or is not found at expected location: \"{command_file}\"")
+        utils.logging.error(f"Command {Color.RED}\"{Color.BLUE}{command}{Color.RED}\"{Color.RESET} does not exist or is not found at expected location: {Color.RED}\"{Color.BLUE}{command_file}{Color.RED}\"{Color.RESET}")
     else:
-        utils.logging.error(f"Scripts folder not found at expected location: \"{SCRIPTS_FOLDER_DIR}\"")
+        utils.logging.error(f"Scripts folder not found at expected location: {Color.RED}\"{Color.BLUE}{SCRIPTS_FOLDER_DIR}{Color.RED}\"{Color.RESET}")
 
     sys.exit(1)
 

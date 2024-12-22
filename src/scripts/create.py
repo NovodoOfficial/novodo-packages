@@ -17,7 +17,6 @@ import os
 
 Markdown = utils.Markdown
 Color = Markdown.Color
-Color.RESET = Markdown.RESET
 Branding = utils.Branding
 
 # V==================================================================================================== CONSTANTS =====V #
@@ -66,6 +65,10 @@ def clear_row():
     
     sys.stdout.write("\r" + " " * width + "\r")
 
+def create_package(options, config_dir):
+
+    pass
+
 # F==================================================================================================== FUNCTIONS =====F #
 
 # M========================================================================================================= MAIN =====M #
@@ -73,18 +76,16 @@ def clear_row():
 def mainCreate():
     spin(3, f"Starting {Branding.ANSI}Novodo Packages{Color.RESET} create process", f"{Color.GREEN}✓ {Branding.ANSI}Novodo Packages{Color.RESET} create process initiated")
 
+    token = utils.Github.get_token(utils.CONFIG_DIR)
+
+    if not token:
+        utils.logging.error(f"{Color.RED}✗{Color.RESET} No GitHub token found. Please run {Color.RED}\"nov config token <token>{Color.RESET}\"")
+        sys.exit(1)
+
     questions = {
         "project_name": {
             "question": "What is the name of your package?",
             "type": "string"
-        },
-        "author_name": {
-            "question": "What is your name?",
-            "type": "string"
-        },
-        "is_private": {
-            "question": "Is this project private?",
-            "type": "boolean"
         }
     }
 
@@ -126,9 +127,9 @@ def mainCreate():
         done += " " * (max(len(question_string) - len(done), 0))
         utils.logging.info(done)
 
-    start_spinning(f"Creating {Color.RED}\"{Color.BLUE}{options['project_name']}{Color.RED}\"{Color.RESET}")
-    
-    stop_spinning(f"{Color.GREEN}✓{Color.RESET} Created {Color.RED}\"{Color.BLUE}{options['project_name']}{Color.RED}\"{Color.RESET}")
+    create_package(options, utils.CONFIG_DIR)
+
+    spin(3, f"Finishing creation of {Color.RED}\"{Color.BLUE}{options['project_name']}{Color.RED}\"", f"{Color.GREEN}✓{Color.RESET} Created {Color.RED}\"{Color.BLUE}{options['project_name']}{Color.RED}\"{Color.RESET}")
 
 # M========================================================================================================= MAIN =====M #
 

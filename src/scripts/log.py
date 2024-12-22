@@ -14,7 +14,6 @@ import sys
 
 Markdown = utils.Markdown
 Color = Markdown.Color
-Color.RESET = Markdown.RESET
 Branding = utils.Branding
 
 # V==================================================================================================== CONSTANTS =====V #
