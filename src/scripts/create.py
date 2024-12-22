@@ -129,7 +129,7 @@ def mainCreate():
 
     create_package(options, token)
 
-    spin(3, f"Finishing creation of {Color.RED}\"{Color.BLUE}{options['project_name']}{Color.RED}\"", f"{Color.GREEN}✓{Color.RESET} Created {Color.RED}\"{Color.BLUE}{options['project_name']}{Color.RED}\"{Color.RESET}")
+    spin(3, f"Finishing creation of {Color.RED}\"{Color.BLUE}{options["package_name"]}{Color.RED}\"", f"{Color.GREEN}✓{Color.RESET} Created {Color.RED}\"{Color.BLUE}{options["package_name"]}{Color.RED}\"{Color.RESET}")
 
 # M========================================================================================================= MAIN =====M #
 
