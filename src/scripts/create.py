@@ -54,6 +54,7 @@ def spin(count, message="", end_message=""):
             sys.stdout.write(f"\r{char} {message} ")
             sys.stdout.flush()
             time.sleep(0.1)
+    clear_row()
     sys.stdout.write(f"\r{end_message} \n")
     sys.stdout.flush()
 
