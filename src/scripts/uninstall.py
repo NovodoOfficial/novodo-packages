@@ -35,16 +35,18 @@ def mainUninstall():
     user_folder = os.path.join(utils.PACKAGES_FOLDER, package_owner)
     repo_folder = os.path.join(user_folder, package_name)
 
+    print(repo_folder)
+
     if not os.path.exists(repo_folder):
         utils.logging.error(f"Repository {package_owner}/{package_name} does not exist.")
         sys.exit(1)
 
-    message = f"Uninstall {Color.RED}\"{Color.BLUE}{package_name}{Color.RED}\"{Color.RESET}? ([Y]es/[N]o)"
+    message = f"Uninstall {Color.RED}\"{Color.BLUE}{package_name}{Color.RED}\"{Color.RESET}? ([Y]es/[N]o)\n"
 
     uninstall_confimation = utils.get_input(message).lower()
 
     if uninstall_confimation in utils.Y_LIST:
-        message = f"Enter the name of the package to confirm the uninstallation: {Color.RED}\"{Color.BLUE}{package_owner}/{package_name}{Color.RED}\"{Color.RESET}"
+        message = f"Enter the name of the package to confirm the uninstallation: {Color.RED}\"{Color.BLUE}{package_owner}/{package_name}{Color.RED}\"{Color.RESET}\n"
 
         uninstall_confimation = utils.get_input(message)
 
