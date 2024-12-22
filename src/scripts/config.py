@@ -7,28 +7,8 @@ import novUtils as utils
 # I================================================================================================ OTHER IMPORTS =====I #
 
 import sys
-import os
 
 # I====================================================================================================== IMPORTS =====I #
-
-# F==================================================================================================== FUNCTIONS =====F #
-
-def backup_config_message(overide=False):
-    confirm = "b"
-    if not overide:
-        confirm = utils.get_input(f"The config file at \"{utils.CONFIG_PATH}\" is going to be modified,\nconfirm action? ([B]ackup first/[Y]es/[N]o)\n").lower()
-
-    if not confirm in utils.Y_LIST + utils.BACKUP_LIST:
-        utils.logging.info(utils.Messages.CANNOT_CONTINUE)
-        sys.exit(1)
-
-    if confirm in utils.BACKUP_LIST:
-        utils.logging.info(f"Backing up \"{utils.CONFIG_PATH}\" to \"{utils.CONFIG_BACKUP_DIR}\"")
-
-        backup = utils.Config.backup(utils.CONFIG_PATH, utils.CONFIG_BACKUP_PATH)
-        utils.logging.info(f"Backed up \"{utils.CONFIG_PATH}\" as \"{backup}\"")
-
-# F==================================================================================================== FUNCTIONS =====F #
 
 # M========================================================================================================= MAIN =====M #
 
@@ -55,21 +35,17 @@ def mainConfig():
         if len(args) != 1:
             utils.logging.error(f"Invalid command:\n{command}")
 
-        backup_config_message()
-
-        utils.Config.save(utils.CONFIG_PATH, utils.CONFIG_TEMPLATE)
+        utils.Config.save(utils.CONFIG_DIR, utils.CONFIG_TEMPLATE)
 
     elif args[0] == "token":
         if len(args) != 2:
             utils.logging.error(f"Invalid command:\n{command}")
 
-        backup_config_message()
-
-        config = utils.Config.load(utils.CONFIG_PATH)
+        config = utils.Config.load(utils.CONFIG_DIR)
 
         config["Github"]["Token"] = args[1]
 
-        utils.Config.save(utils.CONFIG_PATH, config)
+        utils.Config.save(utils.CONFIG_DIR, config)
 
 # M========================================================================================================= MAIN =====M #
 

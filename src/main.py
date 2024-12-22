@@ -52,7 +52,7 @@ def interactive_console():
         command_file = os.path.join(utils.SCRIPT_DIR, "scripts", f"{command}.py")
 
         if os.path.isfile(command_file):
-            subprocess.run([sys.executable, command_file, *args])  # Pass args to subprocess
+            subprocess.run([sys.executable, command_file, *args])
         else:
             utils.logging.error(f"{Color.RED}Error:{Color.RESET}\nCommand {Color.RED}\"{Color.BLUE}{command}{Color.RED}\"{Color.RESET} does not exist or is not found at expected location: {Color.RED}\"{Color.BLUE}{command_file}{Color.RED}\"{Color.RESET}")
 
