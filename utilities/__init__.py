@@ -1,3 +1,4 @@
-import _commands as comands
-from _dotdict import DotDict
-import _errors as errors
+from ._ascii_qr import ascii_qr
+from ._commands import Commands
+from ._dotdict import DotDict
+from ._errors import Errors
