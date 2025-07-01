@@ -1,5 +1,6 @@
 from utilities import Commands
 
-@Commands.Command("install")
+@Commands.Command("install", args=(1, 2))
 def install(args: list):
-    pass
+    print(f"Args: {args}")
+    print(f"Install: {', '.join(args)}")

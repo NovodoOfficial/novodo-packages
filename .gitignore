@@ -1,5 +1,6 @@
 .venv
-*/__pycache__
+github_oauth_secret.text
+**/__pycache__
 build
 dist
 nov

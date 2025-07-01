@@ -5,17 +5,16 @@ class Commands:
     _commands = []
 
     @classmethod
-    def Command(cls, func: callable, name: str, min_args: int = None, max_args: int = None) -> callable:
-        cls._commands.append(DotDict({
-            "name": name,
-            "func": func,
-            "min_args": min_args,
-            "max_args": max_args
-        }))
-
-        def wrapper(*args, **kwargs):
-            return func(*args, **kwargs)
-        return wrapper
+    def Command(cls, name: str, args: tuple[int, int] = (None, None)):
+        def decorator(func: callable):
+            cls._commands.append(DotDict({
+                "name": name,
+                "func": func,
+                "min_args": args[0],
+                "max_args": args[1]
+            }))
+            return func
+        return decorator
 
     @classmethod
     def get_commands(cls) -> list:
@@ -42,4 +41,4 @@ class Commands:
     @classmethod
     def safe_execute_command(cls, name: str, args: list) -> None:
         command = cls.safe_get_command(name, args)
-        command.func(*args)
+        command.func(args)
